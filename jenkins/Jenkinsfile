@@ -4,11 +4,11 @@ stage('build maven artifacts') {
     node('maven') {
         try {
             checkout scm
-            printf("ENV_PROFILE=${ENV_PROFILE}")
-            sh('echo sh: ENV_PROFILE=${ENV_PROFILE}')
-            sh("echo sh: ENV_PROFILE=${ENV_PROFILE}")
+            printf("ENV_PROFILE=${NEXUS_HOST}")
+            sh('echo sh: ENV_PROFILE=${NEXUS_HOST}')
+            sh("echo sh: ENV_PROFILE=${NEXUS_HOST}")
             if (!skip) {
-                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -P ${ENV_PROFILE} -f bakery-app/worker/pom.xml deploy"
+                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -P ${NEXUS_HOST} -f bakery-app/worker/pom.xml deploy"
             }
         }
         finally {
