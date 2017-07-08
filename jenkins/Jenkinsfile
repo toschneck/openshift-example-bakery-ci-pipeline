@@ -1,15 +1,12 @@
 //Jenkinsfile (Declarative Pipeline)
-MODULE_PATH='.'
 stage('build maven artifacts') {
     node('maven') {
-        steps {
+        try {
             checkout scm
             sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -f bakery-app/worker/pom.xml deploy"
         }
-        post {
-            always {
-                junit 'bakery-app/**/*.xml'
-            }
+        finally {
+            junit 'bakery-app/**/*.xml'
         }
     }
 }
