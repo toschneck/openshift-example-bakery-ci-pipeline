@@ -4,13 +4,13 @@ ENV REFRESHED_AT 2017-07-05
 ENV TZ=Europe/Berlin
 
 ## Install
+USER 0
 ### rsync to get logs
 RUN apt-get update \
     && apt-get install -y rsync \
     && apt-get clean -y
 
 ### INSTALL masterpdf
-USER 0
 RUN apt-get update && apt-get install -y libqt5svg5 libqt5printsupport5\
     && wget -qO- http://get.code-industry.net/public/master-pdf-editor-4.2.30_qt5.amd64.tar.gz | tar xzs -C /headless \
     && ln -s /headless/master-pdf-editor-4/masterpdfeditor4 /usr/bin/masterpdfeditor4 \
