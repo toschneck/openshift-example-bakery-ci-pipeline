@@ -1,7 +1,7 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = false
 // global var for routing nexus-repository through the script
-def gNEXUS_HOST= "not-defined"
+String gNEXUS_HOST= "not-defined"
 
 stage('build maven artifacts') {
     node(){
@@ -16,7 +16,7 @@ stage('build maven artifacts') {
             sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
             checkout scm
             if (!skip) {
-                sh "NEXUS_HOST=${gNEXUS_HOST} openshift/bakery-app/maven-build.sh"
+                sh "openshift/bakery-app/maven-build.sh ${gNEXUS_HOST}"
             }
         }
         finally {

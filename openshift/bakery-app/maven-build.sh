@@ -10,7 +10,7 @@ fi
 export NEXUS_HOST=${NEXUS_HOST:-$1}
 if [ -z $NEXUS_HOST ] ;then
     echo "NEXUS_HOST not defined!"
-    exit 0
+    exit -1
 fi
 echo "............. NEXUS_HOST=$NEXUS_HOST"
 
