@@ -1,12 +1,31 @@
 <settings>
-    <mirrors>
-        <mirror>
-            <id>nexus</id>
-            <mirrorOf>*</mirrorOf>
-            <!--<url>http://nexus:8081/content/groups/public</url>-->
-            <url>http://nexus-nexus.paas.osp.consol.de/content/groups/public</url>
-        </mirror>
-    </mirrors>
+
+    <profiles>
+        <profile>
+            <id>consol</id>
+            <mirrors>
+                <mirror>
+                    <id>nexus</id>
+                    <mirrorOf>*</mirrorOf>
+                    <url>http://nexus-nexus.paas.osp.consol.de/content/groups/public</url>
+                </mirror>
+            </mirrors>
+        </profile>
+    </profiles>
+    <profiles>
+        <profile>
+            <id>minishift</id>
+            <mirrors>
+                <mirror>
+                    <id>nexus</id>
+                    <mirrorOf>*</mirrorOf>
+                    <!--<url>http://nexus:8081/content/groups/public</url>-->
+                    <url>http://nexus-nexus.192.168.99.100.nip.io/content/groups/public</url>
+                </mirror>
+            </mirrors>
+        </profile>
+    </profiles>
+
     <servers>
         <server>
             <id>nexus</id>

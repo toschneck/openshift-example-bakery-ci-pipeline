@@ -9,6 +9,9 @@ parameters:
     value: jenkins
   - name: HOSTNAME_HTTP
     description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
+  - name: ENV_PROFILE
+    value: consol
+    required: true
 objects:
 - apiVersion: v1
   kind: DeploymentConfig
@@ -47,6 +50,8 @@ objects:
             value: "true"
           - name: JNLP_SERVICE_NAME
             value: jenkins-jnlp
+          - name:  ENV_PROFILE
+            value: "${ENV_PROFILE}"
           serviceAccount: jenkins
           image: ''
           imagePullPolicy: Always
