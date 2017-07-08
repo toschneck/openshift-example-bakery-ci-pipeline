@@ -4,8 +4,11 @@ stage('build maven artifacts') {
     node('maven') {
         try {
             checkout scm
+            printf("ENV_PROFILE=${ENV_PROFILE}")
+            sh('echo sh: ENV_PROFILE=${ENV_PROFILE}')
+            sh("echo sh: ENV_PROFILE=${ENV_PROFILE}")
             if (!skip) {
-                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -f bakery-app/worker/pom.xml deploy"
+                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -P ${ENV_PROFILE} -f bakery-app/worker/pom.xml deploy"
             }
         }
         finally {
@@ -14,37 +17,37 @@ stage('build maven artifacts') {
         }
     }
 }
-stage('build docker images') {
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> build images?'
+//stage('build docker images') {
+////    timeout(time: 2, unit: 'DAYS') {
+////        input message: '==> build images?'
+////    }
+//    // need node maven because of which not installed in master
+//    parallel web: {
+//        ocBakeryBuild('bakery-web-server')
+//    }, report: {
+//        ocBakeryBuild('bakery-report-server')
+//    }, worker: {
+//        ocBakeryBuild('bakery-workers')
 //    }
-    // need node maven because of which not installed in master
-    parallel web: {
-        ocBakeryBuild('bakery-web-server')
-    }, report: {
-        ocBakeryBuild('bakery-report-server')
-    }, worker: {
-        ocBakeryBuild('bakery-workers')
-    }
-}
-
-stage('deploy DEV system') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: '==> deploy DEV system?'
-    }
-    parallel web: {
-        ocBakeryDeploy('bakery-web-server')
-    }, report: {
-        ocBakeryDeploy('bakery-report-server')
-    }, worker: {
-        ocBakeryDeploy('bakery-workers')
-    }, activemq: {
-        ocBakeryDeploy("activemq")
-    }
-
-}
-stage('Test') {
-}
+//}
+//
+//stage('deploy DEV system') {
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> deploy DEV system?'
+//    }
+//    parallel web: {
+//        ocBakeryDeploy('bakery-web-server')
+//    }, report: {
+//        ocBakeryDeploy('bakery-report-server')
+//    }, worker: {
+//        ocBakeryDeploy('bakery-workers')
+//    }, activemq: {
+//        ocBakeryDeploy("activemq")
+//    }
+//
+//}
+//stage('Test') {
+//}
 
 
 private void ocBakeryBuild(String component) {
