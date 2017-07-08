@@ -1,6 +1,11 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = true
 stage('build maven artifacts') {
+    node(){
+        printf("ENV_PROFILE=${NEXUS_HOST}")
+        sh('echo sh: ENV_PROFILE=${NEXUS_HOST}')
+        sh("echo sh: ENV_PROFILE=${NEXUS_HOST}")
+    }
     node('maven') {
         try {
             checkout scm
