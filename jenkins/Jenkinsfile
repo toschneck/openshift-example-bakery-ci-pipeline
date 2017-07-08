@@ -1,5 +1,6 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = true
+def NEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
 stage('build maven artifacts') {
     node(){
         printf("ENV_PROFILE=${NEXUS_HOST}")
