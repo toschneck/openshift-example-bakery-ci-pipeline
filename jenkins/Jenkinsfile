@@ -68,8 +68,8 @@ private void ocBakeryBuild(String component) {
 }
 private void ocBakeryDeploy(String component) {
     stage("deploy ${component}") {
-        node('maven') {
-            checkout scm
+        node('') {
+//            checkout scm
             try {
                 sh "openshift/bakery-app/create_${component}.sh delete;"
             } catch (e){
