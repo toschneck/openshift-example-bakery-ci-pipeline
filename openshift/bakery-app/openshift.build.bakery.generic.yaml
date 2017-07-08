@@ -35,10 +35,10 @@ parameters:
 - description: Git source URI for application
   name: SOURCE_REPOSITORY_URL
   required: true
-  value: 'https://github.com/toschneck/sakuli-example-bakery-testing'
+  value: 'https://github.com/toschneck/openshift-example-bakery-ci-pipeline'
 - description: Git branch/tag reference
   name: SOURCE_REPOSITORY_REF
-  value: 'pipeline'
+  value: 'master'
 ### Configuration of OpenShift objects
 objects:
 ### BUILD Config

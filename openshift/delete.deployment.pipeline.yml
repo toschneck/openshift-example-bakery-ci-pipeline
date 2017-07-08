@@ -9,10 +9,10 @@ parameters:
     value: 'bakery-delete-ci'
   - name: GIT_URL
     required: true
-    value: 'https://github.com/toschneck/sakuli-example-bakery-testing'
+    value: 'https://github.com/toschneck/openshift-example-bakery-ci-pipeline'
   - name: GIT_BRANCH
     required: true
-    value: 'pipeline'
+    value: 'master'
   - name: GIT_PATH
     required: false
     value: ''
