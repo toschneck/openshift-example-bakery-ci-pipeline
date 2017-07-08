@@ -31,7 +31,7 @@ stage('build docker images') {
 //    timeout(time: 2, unit: 'DAYS') {
 //        input message: '==> build images?'
 //    }
-    node('maven') {
+    node() {
         checkout scm
         // need node maven because of which not installed in master
 //        parallel web: {
