@@ -1,20 +1,22 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = true
+def gNEXUS_HOST= "not-defined"
 stage('build maven artifacts') {
     node(){
         def NEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
-        printf("ENV_PROFILE=${NEXUS_HOST}")
-        sh('echo sh: ENV_PROFILE=${NEXUS_HOST}')
-        sh("echo sh: ENV_PROFILE=${NEXUS_HOST}")
+        gNEXUS_HOST = NEXUS_HOST
+        printf("ENV_PROFILE=${gNEXUS_HOST}")
+        sh('echo sh: ENV_PROFILE=${gNEXUS_HOST}')
+        sh("echo sh: ENV_PROFILE=${gNEXUS_HOST}")
     }
     node('maven') {
         try {
             checkout scm
-            printf("ENV_PROFILE=${NEXUS_HOST}")
-            sh('echo sh: ENV_PROFILE=${NEXUS_HOST}')
-            sh("echo sh: ENV_PROFILE=${NEXUS_HOST}")
+            printf("ENV_PROFILE=${gNEXUS_HOST}")
+            sh('echo sh: ENV_PROFILE=${gNEXUS_HOST}')
+            sh("echo sh: ENV_PROFILE=${gNEXUS_HOST}")
             if (!skip) {
-                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -P ${NEXUS_HOST} -f bakery-app/worker/pom.xml deploy"
+                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -P ${gNEXUS_HOST} -f bakery-app/worker/pom.xml deploy"
             }
         }
         finally {
