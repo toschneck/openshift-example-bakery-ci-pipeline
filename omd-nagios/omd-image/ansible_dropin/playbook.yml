@@ -1,0 +1,6 @@
+---
+
+- name: Configure OMD site {{ SITENAME }} for Bakery Applikation
+  hosts: all
+  roles:
+    - bakery

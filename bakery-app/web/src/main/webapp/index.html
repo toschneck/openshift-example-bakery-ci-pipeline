@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Cookie Bakery Application</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Baker Web UI">
+    <meta name="author" content="ConSol Software GmbH">
+
+    <link type="text/css" href="styles/bootstrap.css" rel="stylesheet"/>
+    <link type="text/css" href="styles/bootstrap-slider.css" rel="stylesheet"/>
+    <link type="text/css" href="styles/custom.css" rel="stylesheet"/>
+
+</head>
+
+<body>
+<div id="content" class="container">
+    <h1>Cookie Bakery Application</h1>
+
+    <p class="lead">Place new orders:</p>
+
+    <form id="orderForm" class="form-horizontal" action="/">
+        <div class="form-group">
+            <label for="amount" class="col-sm-1 control-label">Amount</label>
+            <div class="col-sm-3">
+                <input id="amount" class="form-control" type="text" data-slider-min="1" data-slider-max="40"
+                       data-slider-step="1" data-slider-value="15"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Type</label>
+            <div class="col-sm-3">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <div class="img-bakery"><img src="styles/blueberry.png"></div>
+                        </td>
+                        <td>
+                            <div class="img-bakery"><img src="styles/caramel.png"></div>
+                        </td>
+                        <td>
+                            <div class="img-bakery"><img src="styles/chocolate.png"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="radio-inline">
+                                <input name="type" type="radio" checked="checked" value="blueberry"> blueberry
+                            </label>
+                        </td>
+                        <td>
+                            <label class="radio-inline">
+                                <input name="type" type="radio" value="caramel"> caramel
+                            </label>
+                        </td>
+                        <td>
+                            <label class="radio-inline">
+                                <input name="type" type="radio" value="chocolate"> chocolate
+                            </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-3">
+                <button type="submit" class="btn btn-primary">Place order</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="javascript/jquery.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#orderForm").submit(function (event) {
+            event.preventDefault();
+
+            var orderId = Math.floor((Math.random() * 100000) + 1);
+
+            $.ajax({
+                method: "POST",
+                url: "services/order",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    order: {
+                        id: orderId,
+                        type: $("input[type='radio']:checked").val(),
+                        amount: $("#amount").val()
+                    }
+                }),
+                complete: function () {
+                    $('<span>').text("Submitted '" + $("input[type='radio']:checked").val() + "' order: #" + orderId).appendTo("#content");
+                    $('<br/>').appendTo("#content");
+                }
+            });
+        });
+
+        $("#amount").slider();
+    });
+</script>
+<script type='text/javascript' src="javascript/bootstrap-slider.js"></script>
+</body>
+</html>

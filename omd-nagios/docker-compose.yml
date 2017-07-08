@@ -1,0 +1,21 @@
+version: "2"
+
+networks:
+  default:
+    external:
+      name: appdeploymentdockercompose_sakuli_network
+
+services:
+  omd-e2e-ser:
+      container_name: omd-e2e-ser
+  #    image: consol/omd-labs-centos-sakuli:dev
+      build: omd-image
+      ports:
+      - 8043:443
+      cpu_quota: 65000
+      mem_reservation: 400m
+      mem_limit: 600MB
+      volumes:
+      - /opt/omd/sites/demo/local
+      - /opt/omd/sites/demo/etc
+      - /opt/omd/sites/demo/var

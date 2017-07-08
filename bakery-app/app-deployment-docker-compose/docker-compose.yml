@@ -1,0 +1,79 @@
+#uncomment ports to access the app from outside
+version: "2"
+
+networks:
+  sakuli_network:
+    driver: bridge
+
+services:
+  activemq-broker:
+    container_name: activemq-broker
+    image: consol/activemq-5.12
+    networks:
+    - sakuli_network
+
+  bakery-web-server:
+    container_name: bakery-web-server
+    image: consol/bakery-web-app
+  #  ports:
+  #  - 18001:8080
+    networks:
+    - sakuli_network
+    links:
+    - activemq-broker:activemq
+    - bakery-worker-chocolate
+    - bakery-worker-blueberry
+    - bakery-worker-caramel
+    environment:
+    - ACTIVEMQ_PORT_61616_TCP_ADDR=activemq
+    - ACTIVEMQ_PORT_61616_TCP_PORT=61616
+
+  bakery-report-server:
+    container_name: bakery-report-server
+    image: consol/bakery-report
+    networks:
+    - sakuli_network
+  #  ports:
+  #  - 18002:8080
+
+  bakery-worker-chocolate:
+    container_name: bakery-worker-chocolate
+    image: consol/bakery-worker
+    links:
+    - bakery-report-server:report
+    - activemq-broker:activemq
+    environment:
+    - FACTORY_TYPE=chocolate
+    - FACTORY_COSTS=200
+    - ACTIVEMQ_PORT_61616_TCP_ADDR=activemq
+    - ACTIVEMQ_PORT_61616_TCP_PORT=61616
+    networks:
+    - sakuli_network
+
+  bakery-worker-blueberry:
+    container_name: bakery-worker-blueberry
+    image: consol/bakery-worker
+    links:
+    - bakery-report-server:report
+    - activemq-broker:activemq
+    environment:
+    - FACTORY_TYPE=blueberry
+    - FACTORY_COSTS=400
+    - ACTIVEMQ_PORT_61616_TCP_ADDR=activemq
+    - ACTIVEMQ_PORT_61616_TCP_PORT=61616
+    networks:
+    - sakuli_network
+
+  bakery-worker-caramel:
+    container_name: bakery-worker-caramel
+    image: consol/bakery-worker
+    links:
+    - bakery-report-server:report
+    - activemq-broker:activemq
+    environment:
+    - FACTORY_TYPE=caramel
+    - FACTORY_COSTS=500
+    - ACTIVEMQ_PORT_61616_TCP_ADDR=activemq
+    - ACTIVEMQ_PORT_61616_TCP_PORT=61616
+    networks:
+    - sakuli_network

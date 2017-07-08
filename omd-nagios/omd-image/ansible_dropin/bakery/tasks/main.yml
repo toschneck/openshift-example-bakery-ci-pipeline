@@ -1,0 +1,12 @@
+---
+
+#FIXME error is passed:
+- name: fix for Nagios config file
+  shell: rm -f /opt/omd/sites/demo/etc/nagios/conf.d/sakuli_nagios_objects.cfg /opt/omd/sites/demo/etc/nagios/conf.d/sakuli_nagios_check_mysql.cfg
+- name: set timezone
+  shell: echo 'TZ=Europe/Berlin' >> /opt/omd/sites/demo/etc/environment
+- name: Copy Nagios config file
+  copy:
+    src: sakuli_e2e_monitoring_nagios_objects.cfg
+    dest: /opt/omd/sites/{{ SITENAME }}/etc/nagios/conf.d/
+    owner: "{{ SITENAME }}"

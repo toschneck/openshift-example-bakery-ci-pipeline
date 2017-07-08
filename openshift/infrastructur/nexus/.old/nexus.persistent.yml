@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: nexus
+  labels:
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: nexus
+    name: nexus
+  spec:
+    tags:
+    - annotations:
+        description: The Nexus Docker image
+        tags: nexus
+      from:
+        kind: DockerImage
+        name: sonatype/nexus
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Local
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+    name: nexus-pv
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1G

@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: module-builds
+parameters:
+  - name: APP_NAME
+    required: true
+    value: 'bakery-test-ci'
+  - name: GIT_URL
+    required: true
+    value: 'https://github.com/toschneck/sakuli-example-bakery-testing'
+  - name: GIT_BRANCH
+    required: true
+    value: 'pipeline'
+  - name: GIT_PATH
+    required: false
+    value: ''
+  - name: GITHUB_WEBHOOK_SECRET
+    description: GitHub trigger secret
+    from: '[a-zA-Z0-9]{8}'
+    generate: expression
+    required: true
+  - name: GENERIC_WEBHOOK_SECRET
+    description: Generic build trigger secret
+    from: '[a-zA-Z0-9]{8}'
+    generate: expression
+    required: true
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: ${APP_NAME}
+    labels:
+      application: ${APP_NAME}
+      stage: dev
+  spec:
+    nodeSelector: {}
+    output: {}
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        ref: ${GIT_BRANCH}
+        uri: ${GIT_URL}
+      contextDir: ${GIT_PATH}
+      type: Git
+    strategy:
+      type: JenkinsPipeline
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: openshift/Jenkinsfile
+#        jenkinsfile: |-
+#          MODULE_PATH='.'
+#          node('maven') {
+#            stage ('Checkout') {
+#              git branch: '${GIT_BRANCH}', url: '${GIT_URL}'
+#            }
+#            stage ('build docker images') {
+#              sh "echo ..."
+#            }
+#
+#            stage ('deploy worker') {
+#              script {
+#                 parallel worker: {
+#                       node('maven') {
+#                          step ('worker'){
+#                              sh "openshift/bakery-app/create_bakery-workers.sh build"
+#                          }
+#                       }
+#                  },
+#                    report-server: {
+#                       node('maven') {
+#                         step ('report-server'){
+#                             sh "openshift/bakery-app/create_bakery-report-server.sh build"
+#                         }
+#                       }
+#                    }
+#                  }
+#              }
+#            }
+#          }
+#            stage ('deploy'){
+#              openshiftDeploy(deploymentConfig: 'frontend')
+#            }
+#          stage ('checkout') {
+#            node {
+#                checkout scm
+#                sh "ls -la ${MODULE_PATH}"
+#                sh 'echo checkout'
+#            }
+#          }
+#          stage ('build') {
+#            node ('maven') {
+#              checkout scm
+#              sh "env"
+#              sh "ls -la ${MODULE_PATH}"
+#              sh "mvn -f bakery-app/worker/pom.xml package -Ddocker.useOpenShiftAuth"
+#            }
+#          }
+#          stage ('deploy') {
+#            node {
+#                checkout scm
+#                sh "ls -la ${MODULE_PATH}"
+#                sh 'echo deploy'
+#            }
+#          }
+    triggers:
+    - github:
+        secret: ${GITHUB_WEBHOOK_SECRET}
+      type: GitHub
+    - generic:
+        secret: ${GENERIC_WEBHOOK_SECRET}
+      type: Generic
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    labels:
+      application: ${APP_NAME}
+      stage: dev
+    name: ${APP_NAME}
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+    labels:
+      application: ${APP_NAME}
+      role: jenkins-slave
+    name: maven
+  spec:
+#    dockerImageRepository: docker.io/openshift/jenkins-slave-maven-centos7
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: docker.io/openshift/jenkins-slave-maven-centos7
+      generation: 1
+      importPolicy:
+        scheduled: true
+      name: latest

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!--
+  ~ Sakuli - Testing and Monitoring-Tool for Websites and common UIs.
+  ~
+  ~ Copyright 2013 - 2015 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body {
+            background: url(".markdownpics/bg_bottom_banner.png");
+            background-position: top right;
+            background-size: 15%;
+            background-repeat: no-repeat;
+
+            font-family: 'Source Sans Pro', Arial, sans-serif;
+            font-size: 20px;
+            font-weight: normal;
+            color: #595959;
+
+        }
+
+        table {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        a {
+            color: #595959;
+            text-decoration: none;
+        }
+
+        .docker-blue {
+            color: #327DAF;
+        }
+
+        .wrapper {
+            width: 700px;
+            height: 550px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .scaled-frame {
+            width: 1280px;
+            height: 1100px;
+            border: 0;
+        }
+
+        .scaled-frame {
+            zoom: 0.5;
+            -moz-transform: scale(0.5);
+            -moz-transform-origin: 0 0;
+            -o-transform: scale(0.5);
+            -o-transform-origin: 0 0;
+            -webkit-transform: scale(0.5);
+            -webkit-transform-origin: 0 0;
+        }
+
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            .scaled-frame {
+                zoom: 1;
+            }
+        }
+    </style>
+    <script language="javascript" type="text/javascript">
+        var basicURL = [
+            'consol-openshift',                                            //key
+            '-omd-mon.paas.osp.consol.de',                          //openshift server + project
+            '/vnc_auto.html?password=sakuli&view_only=true',        //url post
+            'OpenShift (paas.osp.consol.de)'                                     //naming
+        ];
+
+        function getCheckName(number) {
+            var checkname = number;
+            switch (number) {
+                case 1:
+                    checkname = 'blueberry';
+                    break;
+                case 2:
+                    checkname = 'caramel';
+                    break;
+                case 3:
+                    checkname = 'chocolate';
+                    break;
+                case 4:
+                    checkname = 'order-pdf';
+                    break;
+            }
+            return checkname;
+        }
+        function getVncUrl(number) {
+            return 'http://' + getCheckName(number) + basicURL[1] + basicURL[2];
+        }
+
+        initialize = function () {
+
+            function divForScreen(id) {
+                var newEl = document.createElement('div');
+                newEl.setAttribute('class', 'wrapper');
+                newEl.innerHTML = '<a target="_blank" href="' + getVncUrl(id) + '">' +
+                    '<b class="docker-blue">' + getCheckName(id) + ' - ' + basicURL[3] + ' ' + id + '</b> (web_vnc)' +
+                    '</a>' +
+                    '<iframe class="scaled-frame" src="' + getVncUrl(id) + '"></iframe>';
+                div.appendChild(newEl);
+                return newEl;
+            }
+
+            var div = document.getElementById("screen1");
+            div.appendChild(divForScreen(1));
+            div = document.getElementById("screen2");
+            div.appendChild(divForScreen(2));
+            div = document.getElementById("screen3");
+            div.appendChild(divForScreen(3));
+            div = document.getElementById("screen4");
+            div.appendChild(divForScreen(4));
+            div = document.getElementById("screen5");
+            div.appendChild(divForScreen(5));
+        }
+    </script>
+</head>
+<body onload="initialize()">
+<table>
+    <tr style="width: 100%">
+        <td>
+            <div id="screen1"></div>
+        </td>
+        <td>
+            <div id="screen2"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div id="screen3"></div>
+        </td>
+        <td>
+            <div id="screen4"></div>
+        </td>
+        <td>
+            <div id="screen5"></div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

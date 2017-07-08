@@ -1,0 +1,18 @@
+FROM jolokia/java-jolokia:7
+
+ARG NEXUS_HOST=nexus-nexus.paas.osp.consol.de
+
+ENV VERS=${VERS}
+ENV FACTORY_TYPE=chocolate, FACTORY_COSTS=200, \
+    REPORT_PORT_8080_TCP_ADDR=bakery-report-server, REPORT_PORT_8080_TCP_PORT=80, \
+    ACTIVEMQ_PORT_61616_TCP_ADDR=activemq, ACTIVEMQ_PORT_61616_TCP_PORT=61616
+
+RUN env  && echo "use NEXUS_HOST: ${NEXUS_HOST}"
+RUN mkdir -p /maven && \
+    curl -L "http://${NEXUS_HOST}/service/local/artifact/maven/redirect?r=snapshots&g=com.consol.demo.bakery&a=bakery-worker&v=LATEST" -o /maven/bakery-worker.jar
+
+# releases
+#ADD http://${NEXUS_HOST}/service/local/repositories/releases/content/com/consol/demo/bakery/bakery-worker/${VERS}/bakery-worker-${VERS}.jar /maven/
+RUN chmod -R -v a+rw /maven && find /maven -type d -exec chmod -v a+x {} +
+
+CMD java -jar /maven/bakery-worker.jar

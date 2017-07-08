@@ -1,0 +1,23 @@
+.slider-track {
+    border: 1px solid #ccc;
+}
+
+.slider-handle {
+    background-image: none;
+    background-repeat: no-repeat;
+}
+
+.img-bakery {
+    text-align: center;
+    width: 70px;
+    height: 50px;
+}
+
+img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.radio-inline {
+    margin-right: 15px
+}

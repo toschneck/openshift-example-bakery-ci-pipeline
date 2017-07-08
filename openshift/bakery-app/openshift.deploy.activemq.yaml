@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: activemq
+metadata:
+  annotations:
+    description: Deploy activemq
+    iconClass: icon-beaker
+    tags: consol
+    version: 1.1.0
+  creationTimestamp: null
+  name: activemq
+### template parameter defined via `oc process -f this.yaml -v PARAMETER=value`
+parameters:
+# REQUIRED
+- name: APP_NAME
+  required: true
+  value: activemq
+- name: IMAGE_DOCKER
+  required: true
+  value: consol/activemq-5.12:usermode
+# OPTIONAL
+- name: ACTIVEMQ_PORT
+  value: '61616'
+- description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
+  name: HOSTNAME_HTTP
+- description: 'Generic build trigger secret'
+  name: GENERIC_WEBHOOK_SECRET
+  generate: expression
+  from: '[a-zA-Z0-9]{8}'
+  required: true
+### Configuration of OpenShift objects
+objects:
+### Image Definition
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    tags:
+    - annotations:
+        description: The ${APP_NAME} Docker image
+        tags: ${APP_NAME}
+      from:
+        kind: DockerImage
+        name: ${IMAGE_DOCKER}
+      importPolicy: {}
+      name: consol
+      referencePolicy:
+        type: Local
+### POD deployment config
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}-dc
+  spec:
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          application: ${APP_NAME}
+          dc: ${APP_NAME}-dc
+        name: ${APP_NAME}-pod
+      dnsPolicy: ClusterFirst
+      terminationGracePeriodSeconds: 3
+      spec:
+        containers:
+        - name: ${APP_NAME}-pod
+          imagePullPolicy: IfNotPresent
+          ### check socket up
+          livenessProbe:
+            tcpSocket:
+              port: 61616
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          ### checks web interface up
+          readinessProbe:
+            tcpSocket:
+              port: 61616
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APP_NAME}-pod
+        from:
+          kind: ImageStreamTag
+          name: ${APP_NAME}:consol
+    - type: ConfigChange
+## Service -> POD config
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: service for ${APP_NAME}
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    ports:
+    - name: http-port
+      protocol: TCP
+      port: '${ACTIVEMQ_PORT}'
+      targetPort: 61616
+    selector:
+      dc: ${APP_NAME}-dc
+#### Route -> Service config
+#- apiVersion: v1
+#  id: ${APP_NAME}-route
+#  kind: Route
+#  metadata:
+#    annotations:
+#      description: Route for ${APP_NAME}
+#    labels:
+#      application: ${APP_NAME}
+#    name: ${APP_NAME}
+#  spec:
+#    host: ${HOSTNAME_HTTP}
+#    to:
+#      name: ${APP_NAME}
+#    port:
+#      targetPort: http-port

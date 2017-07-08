@@ -1,0 +1,29 @@
+### Custom Docker-Sakuli-Client for CM-Testing with PDF viewer
+
+FROM consol/sakuli-ubuntu-xfce:v1.1.0-SNAPSHOT-258_os_kubernetes_improvements
+MAINTAINER Tobias Schneck "tobias.schneck@consol.de"
+ENV REFRESHED_AT 2017-06-13
+
+### set DE as default local
+ENV TZ=Europe/Berlin, LANG=de_DE.UTF-8, LANGUAGE=de_DE.UTF-8
+RUN echo 'user_pref("intl.accept_languages", "de, en-US, en");' >> $SAKULI_ROOT/sahi/config/ff_profile_template/prefs.js
+
+### INSTALL masterpdf
+USER 0
+RUN apt-get update && apt-get install -y libqt5svg5 libqt5printsupport5\
+    && wget -qO- http://get.code-industry.net/public/master-pdf-editor-4.1.30_qt5.amd64.tar.gz | tar xzs -C /headless \
+    && ln -s /headless/master-pdf-editor-4/masterpdfeditor4 /usr/bin/masterpdfeditor4 \
+    && mkdir -p $HOME/.config/Code\ Industry \
+    && echo "[General]\ncheck_updates=0" >> $HOME/.config/Code\ Industry/Master\ PDF\ Editor.conf \
+    && apt-get clean -y
+
+ADD . $SAKULI_ROOT/tests
+ENV SAKULI_TEST_SUITE $SAKULI_ROOT/tests
+RUN $INST_SCRIPTS/set_user_permission.sh $SAKULI_TEST_SUITE
+
+USER 1984
+
+### test if non-root user can write
+RUN touch $SAKULI_TEST_SUITE/write-test-file \
+    && ls -la $SAKULI_TEST_SUITE \
+    && rm $SAKULI_TEST_SUITE/write-test-file

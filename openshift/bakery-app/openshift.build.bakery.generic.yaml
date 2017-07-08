@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: bakery-generic-build
+metadata:
+  annotations:
+    description: Building bakery images
+    iconClass: icon-beaker
+    tags: consol
+    version: 1.1.0
+  creationTimestamp: null
+  name: bakery-generic-build
+### template parameter defined via `oc process -f this.yaml -v PARAMETER=value`
+parameters:
+# REQUIRED
+- name: APP_NAME
+  required: true
+- description: Name of the Dockerfile for example Dockerfile.openshift
+  name: SOURCE_DOCKERFILE
+# OPTIONAL
+- name: SOURCE_DOCKER_CONTEXT_DIR
+  description: Source Folder where the Dockerfile is placed example `docker`
+  value: bakery-app
+- name: NEXUS_HOST
+  required: true
+  # TODO config via script
+  value: 'nexus-nexus.paas.osp.consol.de'
+- name: HOSTNAME_HTTP
+  description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
+- name: GENERIC_WEBHOOK_SECRET
+  description: 'Generic build trigger secret'
+  generate: expression
+  from: '[a-zA-Z0-9]{8}'
+  required: true
+- description: Git source URI for application
+  name: SOURCE_REPOSITORY_URL
+  required: true
+  value: 'https://github.com/toschneck/sakuli-example-bakery-testing'
+- description: Git branch/tag reference
+  name: SOURCE_REPOSITORY_REF
+  value: 'pipeline'
+### Configuration of OpenShift objects
+objects:
+### BUILD Config
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    runPolicy: Serial
+    source:
+      type: Git
+      git:
+        ref: ${SOURCE_REPOSITORY_REF}
+        uri: ${SOURCE_REPOSITORY_URL}
+      contextDir: ${SOURCE_DOCKER_CONTEXT_DIR}
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: ${SOURCE_DOCKERFILE}
+        forcePull: true
+        env:
+          - name: NEXUS_HOST
+            value: "${NEXUS_HOST}"
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APP_NAME}:latest
+    triggers:
+    - generic:
+        secret: ${GENERIC_WEBHOOK_SECRET}
+      type: Generic
+    - imageChange: {}
+      type: ImageChange

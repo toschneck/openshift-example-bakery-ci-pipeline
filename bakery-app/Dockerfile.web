@@ -1,0 +1,18 @@
+FROM consol/tomcat-7.0:7.0.62-usermode
+
+ARG NEXUS_HOST=nexus-nexus.paas.osp.consol.de
+
+ENV ART_NAME=bakery-web-app
+ENV MAIL_PORT_2222_TCP_ADDR=127.0.0.1, MAIL_PORT_2222_TCP_PORT=2222 \
+    ACTIVEMQ_PORT_61616_TCP_ADDR=activemq, ACTIVEMQ_PORT_61616_TCP_PORT=61616
+
+RUN env  && echo "use NEXUS_HOST: ${NEXUS_HOST}"
+RUN mkdir -p /maven && \
+    curl -L "http://${NEXUS_HOST}/service/local/artifact/maven/redirect?r=snapshots&g=com.consol.demo.bakery&a=${ART_NAME}&v=LATEST&e=war" \
+    -o /maven/bakery.war
+
+# releases
+#ADD http://${NEXUS_HOST}/service/local/repositories/releases/content/com/consol/demo/bakery/bakery-worker/${VERS}/bakery-worker-${VERS}.jar /maven/
+RUN chmod -R -v a+rw /maven && find /maven -type d -exec chmod -v a+x {} +
+
+#USE command from base image

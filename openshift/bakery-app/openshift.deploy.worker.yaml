@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: bakery-deploy-worker
+metadata:
+  annotations:
+    description: Deploy bakery images
+    iconClass: icon-beaker
+    tags: consol
+    version: 1.1.0
+  creationTimestamp: null
+  name: bakery-deploy-worker
+### template parameter defined via `oc process -f this.yaml -v PARAMETER=value`
+parameters:
+# REQUIRED
+- name: APP_TYPE
+  required: true
+- name: APP_NAME
+  required: true
+- name: APP_COSTS
+  required: true
+# OPTIONAL
+- name: IMAGE_STREAM
+  required: true
+  value: bakery-worker
+- name: ACTIVEMQ_ADDR
+  value: activemq
+- name: ACTIVEMQ_PORT
+  value: '61616'
+- name: REPORT_ADDR
+  value: bakery-report-server
+- name: REPORT_PORT
+  value: '80'
+- description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
+  name: HOSTNAME_HTTP
+- description: 'Generic build trigger secret'
+  name: GENERIC_WEBHOOK_SECRET
+  generate: expression
+  from: '[a-zA-Z0-9]{8}'
+  required: true
+### Configuration of OpenShift objects
+objects:
+### BUILD Config
+#see .build.yml
+#
+### POD deployment config
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}-dc
+  spec:
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          application: ${APP_NAME}
+          dc: ${APP_NAME}-dc
+        name: ${APP_NAME}-pod
+      dnsPolicy: ClusterFirst
+      terminationGracePeriodSeconds: 3
+      spec:
+        containers:
+        - name: ${APP_NAME}-pod
+          imagePullPolicy: Always
+          env:
+          - name: FACTORY_TYPE
+            value: "${APP_TYPE}"
+          - name: FACTORY_COSTS
+            value: "${APP_COSTS}"
+          - name: ACTIVEMQ_PORT_61616_TCP_ADDR
+            value: "${ACTIVEMQ_ADDR}"
+          - name: ACTIVEMQ_PORT_61616_TCP_PORT
+            value: "${ACTIVEMQ_PORT}"
+          - name: REPORT_PORT_8080_TCP_ADDR
+            value: "${REPORT_ADDR}"
+          - name: REPORT_PORT_8080_TCP_PORT
+            value: "${REPORT_PORT}"
+          ### check gearman up
+#          livenessProbe:
+#            tcpSocket:
+#              port: 4730
+#            initialDelaySeconds: 10
+#            timeoutSeconds: 10
+          ### checks web interface up
+#          readinessProbe:
+#            httpGet:
+#              path: /demo
+#              port: 443
+#              scheme: HTTPS
+#            initialDelaySeconds: 10
+#            timeoutSeconds: 5
+    triggers:
+    - type: "ConfigChange"
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APP_NAME}-pod
+        from:
+          kind: ImageStreamTag
+          name: ${IMAGE_STREAM}:latest
+### Service -> POD config
+

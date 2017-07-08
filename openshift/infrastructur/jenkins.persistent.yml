@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: infrastructure
+  labels:
+parameters:
+  - name: APP_NAME
+    required: true
+    value: jenkins
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: jenkins2-ci
+    name: jenkins2-ci
+  spec:
+    tags:
+    - annotations:
+        description: The jenkins 2 for Openshift Docker image
+        tags: jenkins2-ci
+      from:
+        kind: DockerImage
+        name: openshift/jenkins-2-centos7:latest
+      importPolicy: {}
+      name: centos7
+      referencePolicy:
+        type: Local
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+    labels:
+      app: ${APP_NAME}-persistent
+      template: ${APP_NAME}-persistent-template
+    name: ${APP_NAME}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      serviceaccounts.openshift.io/oauth-redirectreference.jenkins: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"jenkins"}}'
+    labels:
+      app: ${APP_NAME}-persistent
+      template: ${APP_NAME}-persistent-template
+    name: ${APP_NAME}
+- apiVersion: v1
+  kind: RoleBinding
+  metadata:
+    name: jenkins_edit
+  roleRef:
+    name: edit
+  subjects:
+  - kind: ServiceAccount
+    name: jenkins

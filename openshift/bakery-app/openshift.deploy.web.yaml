@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: bakery-deploy-web
+metadata:
+  annotations:
+    description: Deploy bakery images
+    iconClass: icon-beaker
+    tags: consol
+    version: 1.1.0
+  creationTimestamp: null
+  name: bakery-deploy-web
+### template parameter defined via `oc process -f this.yaml -v PARAMETER=value`
+parameters:
+# REQUIRED
+- name: APP_NAME
+  required: true
+- name: IMAGE_STREAM
+  required: true
+- name: PROBE_PATH
+  required: true
+# OPTIONAL
+- name: ACTIVEMQ_ADDR
+  value: activemq
+- name: ACTIVEMQ_PORT
+  value: '61616'
+- description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
+  name: HOSTNAME_HTTP
+- description: 'Generic build trigger secret'
+  name: GENERIC_WEBHOOK_SECRET
+  generate: expression
+  from: '[a-zA-Z0-9]{8}'
+  required: true
+### Configuration of OpenShift objects
+objects:
+### BUILD Config
+#see .build.yml
+#
+### POD deployment config
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}-dc
+  spec:
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          application: ${APP_NAME}
+          dc: ${APP_NAME}-dc
+        name: ${APP_NAME}-pod
+      dnsPolicy: ClusterFirst
+      terminationGracePeriodSeconds: 3
+      spec:
+        containers:
+        - name: ${APP_NAME}-pod
+          env:
+          - name: ACTIVEMQ_PORT_61616_TCP_ADDR
+            value: '${ACTIVEMQ_ADDR}'
+          - name: ACTIVEMQ_PORT_61616_TCP_PORT
+            value: '${ACTIVEMQ_PORT}'
+          imagePullPolicy: Always
+          ### check socket up
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+          ### checks web interface up
+          readinessProbe:
+            httpGet:
+              path: '${PROBE_PATH}'
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APP_NAME}-pod
+        from:
+          kind: ImageStreamTag
+          name: ${IMAGE_STREAM}:latest
+    - type: ConfigChange
+### Service -> POD config
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: service for ${APP_NAME}
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    ports:
+    - name: http-port
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+    selector:
+      dc: ${APP_NAME}-dc
+### Route -> Service config
+- apiVersion: v1
+  id: ${APP_NAME}-route
+  kind: Route
+  metadata:
+    annotations:
+      description: Route for ${APP_NAME}
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    host: ${HOSTNAME_HTTP}
+    to:
+      name: ${APP_NAME}
+    port:
+      targetPort: http-port

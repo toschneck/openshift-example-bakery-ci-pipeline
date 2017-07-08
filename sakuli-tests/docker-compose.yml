@@ -1,0 +1,38 @@
+#### ENV variable will be set by script execute_compose_test.sh
+version: '2'
+
+networks:
+  default:
+    external:
+      name: appdeploymentdockercompose_sakuli_network
+
+services:
+  ### define multiple instances
+  sakuli_1:
+      extends:
+        file: docker-compose.template.service.yml
+        service: sakuli_basic
+      ports:
+      - 5911:5901
+      - 6911:6901
+  sakuli_2:
+      extends:
+        file: docker-compose.template.service.yml
+        service: sakuli_basic
+      ports:
+      - 5912:5901
+      - 6912:6901
+  sakuli_3:
+      extends:
+        file: docker-compose.template.service.yml
+        service: sakuli_basic
+      ports:
+      - 5913:5901
+      - 6913:6901
+  sakuli_4:
+      extends:
+        file: docker-compose.template.service.yml
+        service: sakuli_basic
+      ports:
+      - 5914:5901
+      - 6914:6901
