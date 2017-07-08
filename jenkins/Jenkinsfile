@@ -1,4 +1,5 @@
 //Jenkinsfile (Declarative Pipeline)
+MODULE_PATH='.'
 stage('build maven artifacts') {
     node('maven') {
         steps {
