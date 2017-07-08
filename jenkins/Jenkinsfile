@@ -1,9 +1,12 @@
 //Jenkinsfile (Declarative Pipeline)
+skip = true
 stage('build maven artifacts') {
     node('maven') {
         try {
             checkout scm
-            sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -f bakery-app/worker/pom.xml deploy"
+            if (!skip) {
+                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -f bakery-app/worker/pom.xml deploy"
+            }
         }
         finally {
             printf("Validate Unit-Test")
@@ -12,43 +15,53 @@ stage('build maven artifacts') {
     }
 }
 stage('build docker images') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: 'Build images?'
-    }
-    parallel bakeryweb: {
-        node() {
-            sh "openshift/bakery-app/create_bakery-web-server.sh build"
-        }
-    }, bakeryreport: {
-        node() {
-            sh "openshift/bakery-app/create_bakery-report-server.sh build"
-        }
-    }, bakeryworker: {
-        node() {
-            sh "openshift/bakery-app/create_bakery-workers.sh build"
-        }
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> build images?'
+//    }
+    // need node maven because of which not installed in master
+    parallel web: {
+        ocBakeryBuild('bakery-web-server')
+    }, report: {
+        ocBakeryBuild('bakery-report-server')
+    }, worker: {
+        ocBakeryBuild('bakery-workers')
     }
 }
-stage('deploy dev system') {
+
+stage('deploy DEV system') {
     timeout(time: 2, unit: 'DAYS') {
-        input message: 'Deploy dev system?'
+        input message: '==> deploy DEV system?'
     }
-    parallel bakeryweb: {
-        node() {
-            sh "openshift/bakery-app/create_bakery-web-server.sh"
-        }
-    }, bakeryreport: {
-        node() {
-            sh "openshift/bakery-app/create_bakery-report-server.sh"
-        }
-    }, bakeryworker: {
-        node() {
-            sh "openshift/bakery-app/create_bakery-workers.sh"
-        }
+    parallel web: {
+        ocBakeryDeploy('bakery-web-server')
+    }, report: {
+        ocBakeryDeploy('bakery-report-server')
+    }, worker: {
+        ocBakeryDeploy('bakery-workers')
+    }, activemq: {
+        ocBakeryDeploy("activemq")
     }
+
 }
 stage('Test') {
 }
+
+
+private void ocBakeryBuild(String component) {
+    stage("build ${component} image") {
+        node('maven') {
+            sh "openshift/bakery-app/create_${component}.sh build"
+        }
+    }
+}
+private void ocBakeryDeploy(String component) {
+    stage("deploy ${component}") {
+        node('maven') {
+            sh "openshift/bakery-app/create_${component}.sh delete; openshift/bakery-app/create_${component}.sh "
+        }
+    }
+}
+
 /*
 
 stage('QA') {
