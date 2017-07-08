@@ -50,6 +50,7 @@ stage('Test') {
 private void ocBakeryBuild(String component) {
     stage("build ${component} image") {
         node('maven') {
+            checkout scm
             sh "openshift/bakery-app/create_${component}.sh build"
         }
     }
@@ -57,7 +58,13 @@ private void ocBakeryBuild(String component) {
 private void ocBakeryDeploy(String component) {
     stage("deploy ${component}") {
         node('maven') {
-            sh "openshift/bakery-app/create_${component}.sh delete; openshift/bakery-app/create_${component}.sh "
+            checkout scm
+            try {
+                sh "openshift/bakery-app/create_${component}.sh delete;"
+            } catch (e){
+                printf("only housekeeping, do nonting: %s", e.toString())
+            }
+            sh "openshift/bakery-app/create_${component}.sh"
         }
     }
 }
