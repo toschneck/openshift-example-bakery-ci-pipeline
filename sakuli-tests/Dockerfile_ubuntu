@@ -1,4 +1,4 @@
-FROM consol/sakuli-ubuntu-xfce:v1.1.0-beta
+FROM consol/sakuli-ubuntu-xfce:dev
 MAINTAINER Tobias Schneck "tobias.schneck@consol.de"
 ENV REFRESHED_AT 2017-07-05
 ENV TZ=Europe/Berlin
