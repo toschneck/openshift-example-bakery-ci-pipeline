@@ -376,11 +376,11 @@
     <distributionManagement>
         <repository>
             <id>nexus</id>
-            <url>http://nexus-nexus.paas.osp.consol.de/content/repositories/releases/</url>
+            <url>http://${repos.host}/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>nexusSnap</id>
-            <url>http://nexus-nexus.paas.osp.consol.de/content/repositories/snapshots/</url>
+            <url>http://${repos.host}/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

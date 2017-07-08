@@ -7,6 +7,18 @@
             <url>http://${env.NEXUS_HOST}/content/groups/public</url>
         </mirror>
     </mirrors>
+    <profiles>
+        <profile>
+            <id>default-repo</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <repos.host>${env.NEXUS_HOST}</repos.host>
+            </properties>
+        </profile>
+    </profiles>
+
     <servers>
         <server>
             <id>nexus</id>
