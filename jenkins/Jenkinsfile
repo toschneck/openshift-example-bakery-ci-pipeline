@@ -1,6 +1,8 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = false
+// global var for routing nexus-repository through the script
 def gNEXUS_HOST= "not-defined"
+
 stage('build maven artifacts') {
     node(){
         gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
