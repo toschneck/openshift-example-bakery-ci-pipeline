@@ -124,22 +124,3 @@ objects:
       application: ${APP_NAME}
       stage: dev
     name: ${APP_NAME}
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    annotations:
-    labels:
-      application: ${APP_NAME}
-      role: jenkins-slave
-    name: maven
-  spec:
-#    dockerImageRepository: docker.io/openshift/jenkins-slave-maven-centos7
-    tags:
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: docker.io/openshift/jenkins-slave-maven-centos7
-      generation: 1
-      importPolicy:
-        scheduled: true
-      name: latest
