@@ -16,7 +16,7 @@ stage('build maven artifacts') {
             sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
             checkout scm
             if (!skip) {
-                sh "bash -c 'export NEXUS_HOST=${gNEXUS_HOST} && mvn -B -s openshift/infrastructur/maven-cd-settings.xml -f bakery-app/worker/pom.xml deploy'"
+                sh "NEXUS_HOST=${gNEXUS_HOST} openshift/bakery-app/maven-build.sh"
             }
         }
         finally {
