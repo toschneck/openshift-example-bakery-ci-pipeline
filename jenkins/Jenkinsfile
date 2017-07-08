@@ -1,20 +1,18 @@
 //Jenkinsfile (Declarative Pipeline)
-skip = true
+skip = false
 def gNEXUS_HOST= "not-defined"
 stage('build maven artifacts') {
     node(){
-        def NEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
-        gNEXUS_HOST = NEXUS_HOST
-        printf("ENV_PROFILE=${gNEXUS_HOST}")
-        sh('echo sh: ENV_PROFILE=${gNEXUS_HOST}')
-        sh("echo sh: ENV_PROFILE=${gNEXUS_HOST}")
+        gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
+        if (gNEXUS_HOST == "not-defined"){
+            errors "Environment varibale 'NEXUS'_HOST not specified correctly!"
+        }
+        sh("echo >>>>>>>>>> Using ENV_PROFILE=${gNEXUS_HOST}")
     }
     node('maven') {
         try {
+            sh("echo >>>>>>>>>> Using ENV_PROFILE=${gNEXUS_HOST}")
             checkout scm
-            printf("ENV_PROFILE=${gNEXUS_HOST}")
-            sh('echo sh: ENV_PROFILE=${gNEXUS_HOST}')
-            sh("echo sh: ENV_PROFILE=${gNEXUS_HOST}")
             if (!skip) {
                 sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -P ${gNEXUS_HOST} -f bakery-app/worker/pom.xml deploy"
             }
@@ -25,45 +23,47 @@ stage('build maven artifacts') {
         }
     }
 }
-//stage('build docker images') {
-////    timeout(time: 2, unit: 'DAYS') {
-////        input message: '==> build images?'
-////    }
-//    // need node maven because of which not installed in master
-//    parallel web: {
-//        ocBakeryBuild('bakery-web-server')
-//    }, report: {
-//        ocBakeryBuild('bakery-report-server')
-//    }, worker: {
-//        ocBakeryBuild('bakery-workers')
-//    }
-//}
-//
-//stage('deploy DEV system') {
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> deploy DEV system?'
-//    }
-//    parallel web: {
-//        ocBakeryDeploy('bakery-web-server')
-//    }, report: {
-//        ocBakeryDeploy('bakery-report-server')
-//    }, worker: {
-//        ocBakeryDeploy('bakery-workers')
-//    }, activemq: {
-//        ocBakeryDeploy("activemq")
-//    }
-//
-//}
-//stage('Test') {
-//}
+stage('build docker images') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> build images?'
+    }
+    node('maven') {
+        // need node maven because of which not installed in master
+        parallel web: {
+            ocBakeryBuild('bakery-web-server')
+        }, report: {
+            ocBakeryBuild('bakery-report-server')
+        }, worker: {
+            ocBakeryBuild('bakery-workers')
+        }
+    }
+}
+
+stage('deploy DEV system') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> deploy DEV system?'
+    }
+    parallel web: {
+        ocBakeryDeploy('bakery-web-server')
+    }, report: {
+        ocBakeryDeploy('bakery-report-server')
+    }, worker: {
+        ocBakeryDeploy('bakery-workers')
+    }, activemq: {
+        ocBakeryDeploy("activemq")
+    }
+
+}
+stage('Test') {
+}
 
 
 private void ocBakeryBuild(String component) {
     stage("build ${component} image") {
-        node('maven') {
+//        node('maven') {
             checkout scm
             sh "openshift/bakery-app/create_${component}.sh build"
-        }
+//        }
     }
 }
 private void ocBakeryDeploy(String component) {
