@@ -26,9 +26,9 @@ stage('build maven artifacts') {
     }
 }
 stage('build docker images') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: '==> build images?'
-    }
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> build images?'
+//    }
     node('maven') {
         // need node maven because of which not installed in master
         parallel web: {
@@ -42,9 +42,9 @@ stage('build docker images') {
 }
 
 stage('deploy DEV system') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: '==> deploy DEV system?'
-    }
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> deploy DEV system?'
+//    }
     parallel web: {
         ocBakeryDeploy('bakery-web-server')
     }, report: {
