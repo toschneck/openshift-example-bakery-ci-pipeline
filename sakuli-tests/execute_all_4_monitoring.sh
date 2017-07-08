@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-cd $(dirname `which $0`)
+cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 
 # skip the result evaluation - it will be done by the omd monitoring system
