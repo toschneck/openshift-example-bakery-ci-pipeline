@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-cd $(dirname `which $0`)
+cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 
 echo "ARGS: $1"
@@ -12,6 +12,10 @@ fi
 if [[ $1 =~ build ]]; then
     OS_BUILD_ONLY=true
 fi
+if [ -z  $NEXUS_HOST ]; then
+    NEXUS_HOST="nexus-nexus.paas.osp.consol.de"
+fi
+
 
 TEMPLATE_BUILD=$FOLDER/openshift.build.bakery.generic.yaml
 BUILD_DOCKERFILE='Dockerfile.worker'
@@ -49,6 +53,7 @@ function buildOpenshiftObject(){
     oc process -f "$TEMPLATE_BUILD" \
         -v APP_NAME=$app_name \
         -v SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
+        -v NEXUS_HOST=$NEXUS_HOST \
         | oc apply -f -
     oc start-build "$app_name" --follow --wait
     exit $?

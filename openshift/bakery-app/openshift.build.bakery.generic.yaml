@@ -17,14 +17,12 @@ parameters:
   required: true
 - description: Name of the Dockerfile for example Dockerfile.openshift
   name: SOURCE_DOCKERFILE
+- name: NEXUS_HOST
+  required: true
 # OPTIONAL
 - name: SOURCE_DOCKER_CONTEXT_DIR
   description: Source Folder where the Dockerfile is placed example `docker`
   value: bakery-app
-- name: NEXUS_HOST
-  required: true
-  # TODO config via script
-  value: 'nexus-nexus.paas.osp.consol.de'
 - name: HOSTNAME_HTTP
   description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
 - name: GENERIC_WEBHOOK_SECRET

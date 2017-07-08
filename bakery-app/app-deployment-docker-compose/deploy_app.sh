@@ -2,7 +2,7 @@
 
 function checkDefaults(){
     if [ -z $WORKSPACE ]; then
-        cd $(dirname `which $0`)/../..
+        cd $(dirname $(realpath $0))/../..
         export WORKSPACE=$(pwd)
     fi
     echo "WORKSPACE: $WORKSPACE"

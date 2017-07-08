@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd $(dirname `which $0`)
+cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 echo "ARGS: $1"
 

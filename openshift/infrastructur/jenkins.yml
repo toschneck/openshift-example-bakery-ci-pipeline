@@ -9,8 +9,7 @@ parameters:
     value: jenkins
   - name: HOSTNAME_HTTP
     description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
-  - name: ENV_PROFILE
-    value: consol
+  - name: NEXUS_HOST
     required: true
 objects:
 - apiVersion: v1
@@ -50,8 +49,8 @@ objects:
             value: "true"
           - name: JNLP_SERVICE_NAME
             value: jenkins-jnlp
-          - name:  ENV_PROFILE
-            value: "${ENV_PROFILE}"
+          - name:  NEXUS_HOST
+            value: "${NEXUS_HOST}"
           serviceAccount: jenkins
           image: ''
           imagePullPolicy: Always
