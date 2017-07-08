@@ -4,7 +4,12 @@ MAINTAINER Tobias Schneck "tobias.schneck@consol.de"
 ENV REFRESHED_AT 2017-07-05
 ENV TZ=Europe/Berlin
 
-## Install a PDF viewer
+## Install
+### rsync to get logs
+RUN yum -y install rsync
+    && yum clean all
+
+### INSTALL masterpdf
 USER 0
 RUN yum install -y libsane-hpaio http://get.code-industry.net/public/master-pdf-editor-4.2.30_qt5.x86_64.rpm \
     && yum clean all \
