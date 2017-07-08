@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y libqt5svg5 libqt5printsupport5\
     && apt-get clean -y
 
 ## ADD is only need due to docker-in-docker jenkins can`t currently mount volumens
-ENV SAKULI_TEST_SUITE=SAKULI_ROOT/bakery
-COPY . $SAKULI_ROOT/bakery
+ENV SAKULI_TEST_SUITE=/headless/sakuli/bakery
+COPY . $SAKULI_TEST_SUITE
 RUN $INST_SCRIPTS/set_user_permission.sh $SAKULI_TEST_SUITE
 USER 1984
