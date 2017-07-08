@@ -1,4 +1,4 @@
-FROM consol/sakuli-centos-xfce:dev
+FROM consol/sakuli-centos-xfce:v1.1.0-beta
 
 MAINTAINER Tobias Schneck "tobias.schneck@consol.de"
 ENV REFRESHED_AT 2017-07-05
