@@ -5,16 +5,16 @@ stage('build maven artifacts') {
     node(){
         gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
         if (gNEXUS_HOST == "not-defined"){
-            errors "Environment varibale 'NEXUS'_HOST not specified correctly!"
+            errors "Environment varibale 'NEXUS_HOST' not specified correctly!"
         }
-        sh("echo -------------- Using ENV_PROFILE=${gNEXUS_HOST}")
+        sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
     }
     node('maven') {
         try {
-            sh("echo -------------- Using ENV_PROFILE=${gNEXUS_HOST}")
+            sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
             checkout scm
             if (!skip) {
-                sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -P ${gNEXUS_HOST} -f bakery-app/worker/pom.xml deploy"
+                sh "NEXUS_HOST=${gNEXUS_HOST} mvn -B -s openshift/infrastructur/maven-cd-settings.xml -f bakery-app/worker/pom.xml deploy"
             }
         }
         finally {
