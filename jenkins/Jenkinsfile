@@ -1,5 +1,5 @@
 //Jenkinsfile (Declarative Pipeline)
-skip = false
+skip = true
 // global var for routing nexus-repository through the script
 String gNEXUS_HOST= "not-defined"
 
@@ -17,6 +17,8 @@ stage('build maven artifacts') {
             checkout scm
             if (!skip) {
                 sh "openshift/bakery-app/maven-build.sh ${gNEXUS_HOST}"
+            } else {
+                printf("Skipped maven build!!!")
             }
         }
         finally {
@@ -30,6 +32,7 @@ stage('build docker images') {
 //        input message: '==> build images?'
 //    }
     node('maven') {
+        checkout scm
         // need node maven because of which not installed in master
         parallel web: {
             ocBakeryBuild('bakery-web-server')
@@ -63,7 +66,6 @@ stage('Test') {
 private void ocBakeryBuild(String component) {
     stage("build ${component} image") {
 //        node('maven') {
-            checkout scm
             sh "openshift/bakery-app/create_${component}.sh build"
 //        }
     }
