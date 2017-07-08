@@ -34,29 +34,29 @@ stage('build docker images') {
     node('maven') {
         checkout scm
         // need node maven because of which not installed in master
-        parallel web: {
+//        parallel web: {
             ocBakeryBuild('bakery-web-server')
-        }, report: {
+//        }, report: {
             ocBakeryBuild('bakery-report-server')
-        }, worker: {
+//        }, worker: {
             ocBakeryBuild('bakery-workers')
-        }
+//        }
     }
 }
 
 stage('deploy DEV system') {
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> deploy DEV system?'
-//    }
-    parallel web: {
-        ocBakeryDeploy('bakery-web-server')
-    }, report: {
-        ocBakeryDeploy('bakery-report-server')
-    }, worker: {
-        ocBakeryDeploy('bakery-workers')
-    }, activemq: {
-        ocBakeryDeploy("activemq")
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> deploy DEV system?'
     }
+//    parallel web: {
+        ocBakeryDeploy('bakery-web-server')
+//    }, report: {
+        ocBakeryDeploy('bakery-report-server')
+//    }, worker: {
+        ocBakeryDeploy('bakery-workers')
+//    }, activemq: {
+        ocBakeryDeploy("activemq")
+//    }
 
 }
 stage('Test') {
