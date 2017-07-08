@@ -12,21 +12,25 @@ metadata:
   name: sakuli-e2e-run-pod
 ### template parameter defined via `oc process -f this.yaml -v PARAMETER=value`
 parameters:
-- description: The name for the E2E test suite.
-  name: E2E_TEST_NAME
+## REQUIRED
+- name: E2E_TEST_NAME
+  description: The name for the E2E test suite.
   required: true
-  value: check-links
+- name: BAKERY_BAKERY_URL
+  required: true
+- name: BAKERY_REPORT_URL
+  required: true
+- name: IMAGE_PREFIX
+  description: 'Internal Docker Registry of OpenShift server'
+  ### as long as ImageStreams won't be supported in native Pods this is needed
+  required: true
+## OPTIONAL
 - description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <E2E_TEST_NAME-name>-<project>.<default-domain-suffix>'
   name: HOSTNAME_HTTP
-- description: 'Internal Docker Registry of OpenShift server'
-  ### as long as ImageStreams won't be supported in native Pods this is needed
-  name: IMAGE_PREFIX
-  required: true
-  value:
 - description: 'Sakuli End-2-End image, see `docker search sakuli`'
   name: IMAGE
   required: true
-  value: sakuli-kyocera-image:latest
+  value: sakuli-test-image:latest
 ### Configuration of OpenShift objects
 objects:
 ### POD config (run one time)
@@ -36,37 +40,38 @@ objects:
     labels:
       application: ${E2E_TEST_NAME}
       housekeeping: delete
-    name: ${E2E_TEST_NAME}-pod
+    name: ${E2E_TEST_NAME}
   spec:
     ### ensure that the pod won't start again
     restartPolicy: Never
     dnsPolicy: ClusterFirst
     terminationGracePeriodSeconds: 5
     containers:
-    - name: ${E2E_TEST_NAME}-pod
+    - name: ${E2E_TEST_NAME}
       image: ${IMAGE_PREFIX}/${IMAGE}
       imagePullPolicy: Always
       env:
-        - name: KUBERNETES_RUN_MODE
-          value: 'job'
+        - name: BAKERY_REPORT_URL
+          value: "${BAKERY_REPORT_URL}"
+        - name: BAKERY_BAKERY_URL
+          value: "${BAKERY_BAKERY_URL}"
         - name: JVM_HEAP_XMX_MAX
           value: '350'
         - name: TZ
           value: 'Europe/Berlin'
+#        - name: KUBERNETES_RUN_MODE
+#          value: 'job'
       args:
         ### make normal UI startup to connect via: oc rsh <pod-name> bash
 #        - --tail-log
         ### run in chrome
         - run
-        - /headless/sakuli/tests/${E2E_TEST_NAME}
+        - /headless/sakuli/bakery/${E2E_TEST_NAME}
         # - -browser
         # - chrome
-        ### enable sakuli gearman forward to send results to monitoring server `omd-e2e-ser`
-        - -D
-        - sakuli.forwarder.gearman.enabled=true
         ### set e.g. debug level
-        - -D
-        - log.level.sakuli=DEBUG
+#        - -D
+#        - log.level.sakuli=DEBUG
       ### checks that vnc server is up and running
       livenessProbe:
         tcpSocket:

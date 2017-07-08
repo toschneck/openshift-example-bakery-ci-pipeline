@@ -80,8 +80,8 @@
     </style>
     <script language="javascript" type="text/javascript">
         var basicURL = [
-            'minishift',                                                //key
-            '-omd-mon.192.168.99.100.nip.io',                                     //openshift server + project
+            'oc-cluster-local',                                                //key
+            '-openshift-day-dev.10.0.100.201.xip.io/',                                     //openshift server + project
             '/vnc_auto.html?password=sakuli&view_only=true',        //url post
             'OpenShift (local)'                                       //naming
         ];
@@ -129,8 +129,6 @@
             div.appendChild(divForScreen(3));
             div = document.getElementById("screen4");
             div.appendChild(divForScreen(4));
-            div = document.getElementById("screen5");
-            div.appendChild(divForScreen(5));
         }
     </script>
 </head>
@@ -150,9 +148,6 @@
         </td>
         <td>
             <div id="screen4"></div>
-        </td>
-        <td>
-            <div id="screen5"></div>
         </td>
     </tr>
 </table>

@@ -59,10 +59,7 @@ objects:
       application: ${IMAGE}
     name: ${IMAGE}
   spec:
-    output:
-      to:
-        kind: ImageStreamTag
-        name: ${IMAGE}:${IMAGE_TAG}
+    runPolicy: Serial
     source:
       type: Git
       git:
@@ -73,7 +70,11 @@ objects:
       type: Docker
       dockerStrategy:
         dockerfilePath: ${SOURCE_DOCKERFILE}
-        forcePull: true
+        forcePull: false
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${IMAGE}:${IMAGE_TAG}
     triggers:
     - github:
         secret: ${GITHUB_WEBHOOK_SECRET}
@@ -83,4 +84,3 @@ objects:
       type: Generic
     - imageChange: {}
       type: ImageChange
-    - type: ConfigChange

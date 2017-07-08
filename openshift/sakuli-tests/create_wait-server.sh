@@ -27,12 +27,13 @@ if [ -z $BAKERY_REPORT_URL ]; then
     BAKERY_REPORT_URL="http://bakery-report-server/report/"
 fi
 
-IMAGE_NAME='sakuli-test-image'
-SOURCE_DOCKERFILE='Dockerfile_ubuntu'
+IMAGE_NAME='wait-server'
+SOURCE_DOCKERFILE='Dockerfile'
+SOURCE_DOCKER_CONTEXT_DIR='bakery-app/app-deployment-docker-compose/wait-for-server'
 TEMPLATE_BUILD=$FOLDER/openshift.sakuli.image.build.yaml
-TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.template.yaml
+TEMPLATE_DEPLOY=$FOLDER/openshift.wait.pod.run.template.yaml
 
-echo "ENVS: IMAGE_PREFIX=$IMAGE_PREFIX, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD, TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
+echo "ENVS: IMAGE_PREFIX=$IMAGE_PREFIX, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE, SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR, BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD, TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
 
 count=0
 
@@ -44,7 +45,7 @@ function deployOpenshiftObject(){
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
         -v IMAGE_PREFIX=$IMAGE_PREFIX \
-        -v E2E_TEST_NAME=$app_name \
+        -v APP_NAME=$app_name \
         -v BAKERY_REPORT_URL=$BAKERY_REPORT_URL \
         -v BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL \
         | oc apply -f -
@@ -58,11 +59,7 @@ function deployOpenshiftObject(){
 function deleteOpenshiftObject(){
     app_name=$1
     echo "DELETE Config for $app_name"
-    oc delete dc -l "application=$app_name"  --grace-period=5
-    oc delete deployment -l "application=$app_name"  --grace-period=5
     oc delete pods -l "application=$app_name"  --grace-period=5
-    oc delete service -l "application=$app_name"  --grace-period=5
-    oc delete route -l "application=$app_name"  --grace-period=5
     echo "-------------------------------------------------------------------"
 
 }
@@ -72,6 +69,7 @@ function buildOpenshiftObject(){
     oc process -f "$TEMPLATE_BUILD" \
         -v IMAGE=$IMAGE_NAME \
         -v SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
+        -v SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
         | oc apply -f -
     oc start-build "$IMAGE_NAME" --follow --wait
     exit $?
@@ -81,6 +79,7 @@ function buildDeleteOpenshiftObject(){
     oc process -f "$TEMPLATE_BUILD" \
         -v IMAGE=$IMAGE_NAME \
         -v SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
+        -v SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
         | oc delete -f -
     echo "-------------------------------------------------------------------"
 }
@@ -102,15 +101,7 @@ function triggerOpenshift() {
     ((count++))
 
 }
-SER_NAME=$1
-if [[ $OS_DELETE_DEPLOYMENT == "true" ]]; then
-    SER_NAME=$2
-fi
-if [[ $SER_NAME == "" ]]; then
-    echo "define var 'SER_NAME'!"
-    exit -1
-fi
-
+SER_NAME=$IMAGE_NAME
 triggerOpenshift
 
 wait

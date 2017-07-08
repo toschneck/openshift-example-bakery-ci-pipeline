@@ -8,7 +8,6 @@ IMAGE_NAME='sakuli-test-image'
 count=0
 maxval=100
 
-SER_NAME='blueberry-pod'
 SER_NAME=$1
 
 function validate() {
@@ -21,17 +20,14 @@ function validate() {
         ((count++))
     done;
     echo "-------------------------------------------------------------------"
-
+    oc logs $SER_NAME
+    echo "-------------------------------------------------------------------"
     exitcode=$(oc describe pod $SER_NAME --show-events=false | grep 'Exit Code:' |  awk '{print $3}')
     echo "EXIT_CODE: $exitcode"
+
+    #onyl on running containers possible :-(
+    #oc rsync "$SER_NAME":/headless/sakuli/bakery/$SER_NAME/\*\*/_logs $FOLDER/
     exit $exitcode
-
-#    pods_template='{{range .items}}{{print .metadata.name " " .metadata.labels.name " " .status.phase}}{{range .status.conditions}}{{if eq .type "Ready"}} {{.status}}{{end}}{{end}}{{println}}{{end}}'
-
-#    oc get pods -l application=$SER_NAME
-#    oc get pods -l application=$SER_NAME -o=go-template --template=$pods_template
-
-
 
 }
 

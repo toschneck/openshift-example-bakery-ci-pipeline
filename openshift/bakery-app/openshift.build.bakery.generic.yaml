@@ -64,7 +64,7 @@ objects:
       type: Docker
       dockerStrategy:
         dockerfilePath: ${SOURCE_DOCKERFILE}
-        forcePull: true
+        forcePull: false
         env:
           - name: NEXUS_HOST
             value: "${NEXUS_HOST}"

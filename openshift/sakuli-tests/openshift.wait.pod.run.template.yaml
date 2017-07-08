@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: wait-run-pod
+metadata:
+  annotations:
+    description: Sakuli wait server template (run as pod)
+    iconClass: icon-beaker
+    tags: consol, sakuli, e2e-testing, e2e-monitoring
+    version: 1.1.0
+  creationTimestamp: null
+  name: wait-run-pod
+### template parameter defined via `oc process -f this.yaml -v PARAMETER=value`
+parameters:
+## REQUIRED
+- name: APP_NAME
+  required: true
+- name: BAKERY_BAKERY_URL
+  required: true
+- name: BAKERY_REPORT_URL
+  required: true
+- name: IMAGE_PREFIX
+  description: 'Internal Docker Registry of OpenShift server'
+  ### as long as ImageStreams won't be supported in native Pods this is needed
+  required: true
+## OPTIONAL
+- name: IMAGE
+  required: true
+  value: wait-server:latest
+### Configuration of OpenShift objects
+objects:
+### POD config (run one time)
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    labels:
+      application: ${APP_NAME}
+      housekeeping: delete
+    name: ${APP_NAME}
+  spec:
+    ### ensure that the pod won't start again
+    restartPolicy: Never
+    dnsPolicy: ClusterFirst
+    terminationGracePeriodSeconds: 5
+    containers:
+    - name: ${APP_NAME}
+      image: ${IMAGE_PREFIX}/${IMAGE}
+      imagePullPolicy: Always
+      env:
+        - name: BAKERY_REPORT_URL
+          value: "${BAKERY_REPORT_URL}"
+        - name: BAKERY_BAKERY_URL
+          value: "${BAKERY_BAKERY_URL}"
+          
+
+      
