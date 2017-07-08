@@ -51,6 +51,7 @@ objects:
       type: JenkinsPipeline
       jenkinsPipelineStrategy:
         jenkinsfilePath: openshift/Jenkinsfile
+# Jenkinsfile (Scripted Pipeline):
 #        jenkinsfile: |-
 #          MODULE_PATH='.'
 #          node('maven') {

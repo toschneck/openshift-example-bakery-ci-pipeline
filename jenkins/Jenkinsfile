@@ -1,0 +1,50 @@
+//Jenkinsfile (Declarative Pipeline)
+APP_PATH = './bakery-app'
+stage('Build') {
+    node {
+        checkout scm
+        def buildVersion = sh(script: 'git rev-parse --short HEAD | head -c 7', returnStdout: true)
+        dir("${APP_PATH}") {
+            printf("version: %s%n", buildVersion)
+            sh "echo stage one"
+        }
+    }
+}
+stage('Test') {
+    parallel mvn: {
+        node('maven') {
+            checkout scm
+            dir("${APP_PATH}") {
+                try {
+                    sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -B clean"
+                }
+                finally {
+//                archive "target/site/jacoco/**/*"
+                }
+
+            }
+        }
+    },
+            shell: {
+                sh "echo my parallel step"
+//                sh "./create_module_qa.sh"
+//                sh "./stage_build.sh dev qa";
+            }
+}
+/*
+
+stage('QA') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: 'Do you want to deploy into Prod?'
+    }
+}
+stage('Prod') {
+        node {
+            dir ("${MODULE_PATH}/infra") {
+                sh "./create_module_prod.sh"
+                sh "./stage_build.sh qa prod";
+            }
+        }
+}
+*/
+
