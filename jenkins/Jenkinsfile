@@ -1,35 +1,33 @@
 //Jenkinsfile (Declarative Pipeline)
-APP_PATH = './bakery-app'
-stage('Build') {
-    node {
-        checkout scm
-        def buildVersion = sh(script: 'git rev-parse --short HEAD | head -c 7', returnStdout: true)
-        dir("${APP_PATH}") {
-            printf("version: %s%n", buildVersion)
-            sh "echo stage one"
+stage('build maven artifacts') {
+    node('maven') {
+        steps {
+            checkout scm
+            sh "mvn -B -s openshift/infrastructur/maven-cd-settings.xml -f bakery-app/worker/pom.xml deploy"
+        }
+        post {
+            always {
+                junit 'bakery-app/**/*.xml'
+            }
+        }
+    }
+}
+stage('build docker images') {
+    parallel bakeryweb: {
+        node() {
+            sh "openshift/bakery-app/create_bakery-web-server.sh build"
+        }
+    }, bakeryreport: {
+        node() {
+            sh "openshift/bakery-app/create_bakery-report-server.sh build"
+        }
+    }, bakeryworker: {
+        node() {
+            sh "openshift/bakery-app/create_bakery-workers.sh build"
         }
     }
 }
 stage('Test') {
-    parallel mvn: {
-        node('maven') {
-            checkout scm
-            dir("${APP_PATH}") {
-                try {
-                    sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -B clean"
-                }
-                finally {
-//                archive "target/site/jacoco/**/*"
-                }
-
-            }
-        }
-    },
-            shell: {
-                sh "echo my parallel step"
-//                sh "./create_module_qa.sh"
-//                sh "./stage_build.sh dev qa";
-            }
 }
 /*
 
