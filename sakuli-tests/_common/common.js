@@ -3,10 +3,20 @@ var COMMON_PATH = "../../_common";
 var PDF_EDITOR_NAME = "masterpdfeditor4";
 
 function bakeryURL() {
-    return "http://bakery-web-server:8080/bakery/";
+    envUrl = getEnvVar('BAKERY_BAKERY_URL');
+    if (envUrl === "") {
+        envUrl = "http://bakery-web-server:8080/bakery/";
+    }
+    Logger.logInfo("BAKERY_URL: " + envUrl);
+    return envUrl;
 }
 function reportURL() {
-    return "http://bakery-report-server:8080/report/";
+    envUrl = getEnvVar('BAKERY_REPORT_URL');
+    if (envUrl === "") {
+        envUrl = "http://bakery-report-server:8080/report/";
+    }
+    Logger.logInfo("REPORT_URL: " + envUrl);
+    return envUrl;
 }
 
 function sleep4Prasentation() {
@@ -78,4 +88,8 @@ function openPrintPreview() {
     } else {
         env.type("p", Key.CTRL);
     }
+}
+
+function getEnvVar(key) {
+    return Packages.java.lang.System.getenv(key);
 }
