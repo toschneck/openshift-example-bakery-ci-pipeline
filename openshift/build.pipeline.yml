@@ -50,7 +50,7 @@ objects:
     strategy:
       type: JenkinsPipeline
       jenkinsPipelineStrategy:
-        jenkinsfilePath: openshift/Jenkinsfile
+        jenkinsfilePath: jenkins/Jenkinsfile
 # Jenkinsfile (Scripted Pipeline):
 #        jenkinsfile: |-
 #          MODULE_PATH='.'
