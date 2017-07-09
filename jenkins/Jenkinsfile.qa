@@ -1,0 +1,91 @@
+//Jenkinsfile (Declarative Pipeline)
+skip = true
+// global var for get internal registry
+String gIMAGE_PREFIX = "not-defined"
+String STAGE = "qa"
+
+stage('deploy QA system') {
+    node('') {
+        selectStage(STAGE)
+        ocBakeryDeploy('bakery-web-server')
+        ocBakeryDeploy('bakery-report-server')
+        ocBakeryDeploy('bakery-workers')
+        ocBakeryDeploy("activemq")
+    }
+}
+stage('E2E Tests') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> start E2E tests system?'
+    }
+    node('') {
+        //check ENV
+        node() {
+            gIMAGE_PREFIX = sh(script: 'echo ${IMAGE_REG}/openshift-day-qa', returnStdout: true)
+            if (gIMAGE_PREFIX == "not-defined") {
+                errors "Environment varibale 'IMAGE_PREFIX' not specified correctly!"
+            }
+            sh("echo -------------- Using IMAGE_PREFIX=${gIMAGE_PREFIX}")
+        }
+        selectStage(STAGE)
+        parallel sakulibuild: {
+            ocSakuliBuild('sakuli-test')
+        }, waitserver: {
+            ocSakuliBuild('wait-server')
+        }
+        sh "openshift/sakuli-tests/create_wait-server.sh"
+        parallel blueberry: {
+            ocSakuliDeploy('blueberry')
+        }, caramel: {
+            ocSakuliDeploy('caramel')
+        }, chocolate: {
+            ocSakuliDeploy('chocolate')
+        }, orderpdf: {
+            ocSakuliDeploy('order-pdf')
+        }
+    }
+}
+
+stage('Trigger PROD') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> deploy PROD system?'
+    }
+    node('') {
+        ocstage(STAGE, "prod")
+        //trigger next build pipeline
+        sh "openshift/create-build-pipeline.sh prod"
+    }
+}
+
+
+private void ocBakeryDeploy(String component) {
+    stage("deploy ${component}") {
+        try {
+            sh "openshift/bakery-app/create_${component}.sh delete;"
+        } catch (e) {
+            printf("only housekeeping, do nonting: %s", e.toString())
+        }
+        sh "openshift/bakery-app/create_${component}.sh"
+    }
+}
+
+private void ocSakuliBuild(String component) {
+    stage("build ${component} image") {
+        sh "openshift/sakuli-tests/create_${component}.sh build"
+    }
+}
+
+private void ocSakuliDeploy(String component) {
+    stage("start ${component}") {
+        sh "openshift/sakuli-tests/create_sakuli-test.sh ${component}"
+    }
+}
+
+private void selectStage(String stage) {
+    sh "oc project openshift-day-${stage}"
+}
+
+private void ocstage(String src, String dest) {
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-report-server"
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-web-server"
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-worker-server"
+}

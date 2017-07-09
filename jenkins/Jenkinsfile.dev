@@ -1,0 +1,79 @@
+//Jenkinsfile (Declarative Pipeline)
+skip = false
+// global var for routing nexus-repository through the script
+String gNEXUS_HOST = "not-defined"
+String STAGE = "dev"
+stage('build maven artifacts') {
+    //check ENV
+    node() {
+        gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
+        if (gNEXUS_HOST == "not-defined") {
+            errors "Environment varibale 'NEXUS_HOST' not specified correctly!"
+        }
+        sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
+    }
+
+    //artifact builds
+    node('maven') {
+        try {
+            sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
+            selectStage(STAGE)
+            checkout scm
+            if (!skip) {
+                sh "openshift/bakery-app/maven-build.sh ${gNEXUS_HOST}"
+            } else {
+                printf("Skipped maven build!!!")
+            }
+        }
+        finally {
+            printf("Validate Unit-Test")
+//            junit 'bakery-app/**/*.xml'
+        }
+    }
+}
+
+stage('build docker images') {
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> build images?'
+//    }
+    node() {
+        checkout scm
+        selectStage(STAGE)
+        parallel web: {
+            ocBakeryBuild('bakery-web-server')
+        }, report: {
+            ocBakeryBuild('bakery-report-server')
+        }, worker: {
+            ocBakeryBuild('bakery-workers')
+        }
+
+    }
+}
+
+stage('Trigger QA') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> trigger QA?'
+    }
+    node('') {
+        ocstage(STAGE, "qa")
+        //trigger next build pipeline
+        sh "openshift/create-build-pipeline.sh qa"
+    }
+}
+
+
+private void ocBakeryBuild(String component) {
+    stage("build ${component} image") {
+        sh "openshift/bakery-app/create_${component}.sh build"
+    }
+}
+
+private void selectStage(String stage) {
+    sh "oc project openshift-day-${stage}"
+}
+
+private void ocstage(String src, String dest) {
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-report-server"
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-web-server"
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-worker-server"
+}

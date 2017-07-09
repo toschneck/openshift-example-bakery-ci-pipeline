@@ -1,0 +1,36 @@
+//Jenkinsfile (Declarative Pipeline)
+skip = true
+// global var for get internal registry
+String STAGE = "prod"
+
+stage('deploy PROD system') {
+    node('') {
+        selectStage(STAGE)
+        ocBakeryDeploy('bakery-web-server')
+        ocBakeryDeploy('bakery-report-server')
+        ocBakeryDeploy('bakery-workers')
+        ocBakeryDeploy("activemq")
+    }
+}
+
+private void ocBakeryDeploy(String component) {
+    stage("deploy ${component}") {
+        try {
+            sh "openshift/bakery-app/create_${component}.sh delete;"
+        } catch (e) {
+            printf("only housekeeping, do nonting: %s", e.toString())
+        }
+        sh "openshift/bakery-app/create_${component}.sh"
+    }
+}
+
+
+private void selectStage(String stage) {
+    sh "oc project openshift-day-${stage}"
+}
+
+private void ocstage(String src, String dest) {
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-report-server"
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-web-server"
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-worker-server"
+}
