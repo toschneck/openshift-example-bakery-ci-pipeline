@@ -69,6 +69,8 @@ function deleteOpenshiftObject(){
 
 function buildOpenshiftObject(){
     echo "Trigger Build for $IMAGE_NAME"
+    oc delete builds -l application=$IMAGE_NAME
+
     oc process -f "$TEMPLATE_BUILD" \
         -v IMAGE=$IMAGE_NAME \
         -v SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
