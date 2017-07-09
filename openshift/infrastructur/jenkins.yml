@@ -55,6 +55,8 @@ objects:
             value: "${NEXUS_HOST}"
           - name:  IMAGE_REG
             value: "${IMAGE_REG}"
+          - name: TZ
+            value: 'Europe/Berlin'
           serviceAccount: jenkins
           image: ''
           imagePullPolicy: Always

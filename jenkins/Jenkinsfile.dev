@@ -40,14 +40,20 @@ stage('build docker images') {
     node() {
         checkout scm
         selectStage(STAGENAME)
-        parallel web: {
-            ocBakeryBuild('bakery-web-server')
-        }, report: {
-            ocBakeryBuild('bakery-report-server')
-        }, worker: {
-            ocBakeryBuild('bakery-workers')
+        parallel {
+            web:
+            {
+                ocBakeryBuild('bakery-web-server')
+            }
+            report:
+            {
+                ocBakeryBuild('bakery-report-server')
+            }
+            worker:
+            {
+                ocBakeryBuild('bakery-workers')
+            }
         }
-
     }
 }
 
