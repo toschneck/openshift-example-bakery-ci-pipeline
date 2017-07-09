@@ -73,6 +73,8 @@ stage('Trigger PROD') {
 
         //use dev jenkins
         selectStage("dev")
+        //delete qa staqe
+        sh "openshift/delete-deployment-pipeline.sh qa"
         //trigger next build pipeline
         sh "openshift/create-build-pipeline.sh prod"
     }
