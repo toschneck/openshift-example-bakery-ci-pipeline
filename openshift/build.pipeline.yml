@@ -2,11 +2,12 @@ apiVersion: v1
 kind: Template
 metadata:
   creationTimestamp: null
-  name: module-builds
+  name: ci-builds
 parameters:
   - name: APP_NAME
     required: true
-    value: 'bakery-test-ci'
+  - name: STAGE
+    required: true
   - name: GIT_URL
     required: true
     value: 'https://github.com/toschneck/openshift-example-bakery-ci-pipeline'
@@ -50,63 +51,7 @@ objects:
     strategy:
       type: JenkinsPipeline
       jenkinsPipelineStrategy:
-        jenkinsfilePath: jenkins/Jenkinsfile
-# Jenkinsfile (Scripted Pipeline):
-#        jenkinsfile: |-
-#          MODULE_PATH='.'
-#          node('maven') {
-#            stage ('Checkout') {
-#              git branch: '${GIT_BRANCH}', url: '${GIT_URL}'
-#            }
-#            stage ('build docker images') {
-#              sh "echo ..."
-#            }
-#
-#            stage ('deploy worker') {
-#              script {
-#                 parallel worker: {
-#                       node('maven') {
-#                          step ('worker'){
-#                              sh "openshift/bakery-app/create_bakery-workers.sh build"
-#                          }
-#                       }
-#                  },
-#                    report-server: {
-#                       node('maven') {
-#                         step ('report-server'){
-#                             sh "openshift/bakery-app/create_bakery-report-server.sh build"
-#                         }
-#                       }
-#                    }
-#                  }
-#              }
-#            }
-#          }
-#            stage ('deploy'){
-#              openshiftDeploy(deploymentConfig: 'frontend')
-#            }
-#          stage ('checkout') {
-#            node {
-#                checkout scm
-#                sh "ls -la ${MODULE_PATH}"
-#                sh 'echo checkout'
-#            }
-#          }
-#          stage ('build') {
-#            node ('maven') {
-#              checkout scm
-#              sh "env"
-#              sh "ls -la ${MODULE_PATH}"
-#              sh "mvn -f bakery-app/worker/pom.xml package -Ddocker.useOpenShiftAuth"
-#            }
-#          }
-#          stage ('deploy') {
-#            node {
-#                checkout scm
-#                sh "ls -la ${MODULE_PATH}"
-#                sh 'echo deploy'
-#            }
-#          }
+        jenkinsfilePath: "jenkins/Jenkinsfile.${STAGE}"
     triggers:
     - github:
         secret: ${GITHUB_WEBHOOK_SECRET}
@@ -122,5 +67,5 @@ objects:
     creationTimestamp: null
     labels:
       application: ${APP_NAME}
-      stage: dev
+      stage: ${STAGE}
     name: ${APP_NAME}

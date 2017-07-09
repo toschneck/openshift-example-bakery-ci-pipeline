@@ -23,10 +23,10 @@ function validate() {
     echo "-------------------------------------------------------------------"
     oc logs $SER_NAME
     echo "-------------------------------------------------------------------"
-    if [ $count -lt $maxval ]; then
-        echo "reached max val of retries: $maxval"
+    if [ $count -ge $maxval ]; then
+        echo "count $count reached max val of retries: $maxval"
         oc delete pod $SER_NAME
-        exitcode = -1
+        exitcode=-1
     else
         exitcode=$(oc describe pod $SER_NAME --show-events=false | grep 'Exit Code:' |  awk '{print $3}')
     fi
