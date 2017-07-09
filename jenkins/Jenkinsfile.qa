@@ -8,23 +8,14 @@ stage('deploy QA system') {
     node('') {
         selectStage(STAGENAME)
         checkout scm
-        parallel {
-            activemq:
-            {
-                ocBakeryDeploy("activemq")
-            }
-            web:
-            {
-                ocBakeryDeploy('bakery-web-server')
-            }
-            report:
-            {
-                ocBakeryDeploy('bakery-report-server')
-            }
-            workers:
-            {
-                ocBakeryDeploy('bakery-workers')
-            }
+        parallel activemq: {
+            ocBakeryDeploy("activemq")
+        }, web: {
+            ocBakeryDeploy('bakery-web-server')
+        }, report: {
+            ocBakeryDeploy('bakery-report-server')
+        }, workers: {
+            ocBakeryDeploy('bakery-workers')
         }
     }
 }
@@ -44,34 +35,22 @@ stage('E2E Tests') {
         selectStage(STAGENAME)
 
         //build and start sakuli tests
-        parallel {
-            sakulibuild:
-            {
-                ocSakuliBuild('sakuli-test')
-            }
-            waitserver:
-            {
-                ocSakuliBuild('wait-server')
-            }
+        parallel sakulibuild: {
+            ocSakuliBuild('sakuli-test')
+        }, waitserver: {
+            ocSakuliBuild('wait-server')
         }
+
         sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
-        parallel {
-            blueberry:
-            {
-                ocSakuliDeploy(blueberry)
-            }
-            caramel:
-            {
-                ocSakuliDeploy('caramel')
-            }
-            chocolate:
-            {
-                ocSakuliDeploy('chocolate')
-            }
-            orderpdf:
-            {
-                ocSakuliDeploy('order-pdf')
-            }
+
+        parallel blueberry: {
+            ocSakuliDeploy('blueberry')
+        }, caramel: {
+            ocSakuliDeploy('caramel')
+        }, chocolate: {
+            ocSakuliDeploy('chocolate')
+        }, orderpdf: {
+            ocSakuliDeploy('order-pdf')
         }
     }
 }
