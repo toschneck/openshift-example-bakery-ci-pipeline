@@ -9,10 +9,22 @@ stage('deploy QA system') {
         selectStage(STAGENAME)
         checkout scm
         parallel {
-            ocBakeryDeploy("activemq")
-            ocBakeryDeploy('bakery-web-server')
-            ocBakeryDeploy('bakery-report-server')
-            ocBakeryDeploy('bakery-workers')
+            activemq:
+            {
+                ocBakeryDeploy("activemq")
+            }
+            web:
+            {
+                ocBakeryDeploy('bakery-web-server')
+            }
+            report:
+            {
+                ocBakeryDeploy('bakery-report-server')
+            }
+            workers:
+            {
+                ocBakeryDeploy('bakery-workers')
+            }
         }
     }
 }
