@@ -1,11 +1,11 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = true
 // global var for get internal registry
-String STAGE = "prod"
+STAGENAME = "prod"
 
 stage('deploy PROD system') {
     node('') {
-        selectStage(STAGE)
+        selectStage(STAGENAME)
         checkout scm
 
         ocBakeryDeploy('bakery-web-server')
@@ -26,9 +26,8 @@ private void ocBakeryDeploy(String component) {
     }
 }
 
-
-private void selectStage(String stage) {
-    sh "oc project openshift-day-${stage}"
+private void selectStage(String stagename) {
+    sh "oc project openshift-day-${stagename}"
 }
 
 private void ocstage(String src, String dest) {

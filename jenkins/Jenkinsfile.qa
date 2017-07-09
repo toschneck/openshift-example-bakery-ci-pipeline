@@ -2,16 +2,16 @@
 skip = true
 // global var for get internal registry
 String gIMAGE_PREFIX = "not-defined"
-String STAGE = "qa"
+STAGENAME = "qa"
 
 stage('deploy QA system') {
     node('') {
-        selectStage(STAGE)
+        selectStage(STAGENAME)
         checkout scm
+        ocBakeryDeploy("activemq")
         ocBakeryDeploy('bakery-web-server')
         ocBakeryDeploy('bakery-report-server')
         ocBakeryDeploy('bakery-workers')
-        ocBakeryDeploy("activemq")
     }
 }
 stage('E2E Tests') {
@@ -27,7 +27,7 @@ stage('E2E Tests') {
             }
             sh("echo -------------- Using IMAGE_PREFIX=${gIMAGE_PREFIX}")
         }
-        selectStage(STAGE)
+        selectStage(STAGENAME)
 
         //build and start sakuli tests
         parallel sakulibuild: {
@@ -53,7 +53,7 @@ stage('Trigger PROD') {
         input message: '==> deploy PROD system?'
     }
     node('') {
-        ocstage(STAGE, "prod")
+        ocstage(STAGENAME, "prod")
         //trigger next build pipeline
         sh "openshift/create-build-pipeline.sh prod"
     }
@@ -73,18 +73,18 @@ private void ocBakeryDeploy(String component) {
 
 private void ocSakuliBuild(String component) {
     stage("build ${component} image") {
-        sh "STAGE=${STAGE} openshift/sakuli-tests/create_${component}.sh build"
+        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_${component}.sh build"
     }
 }
 
 private void ocSakuliDeploy(String component) {
     stage("start ${component}") {
-        sh "STAGE=${STAGE} openshift/sakuli-tests/create_sakuli-test.sh ${component}"
+        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_sakuli-test.sh ${component}"
     }
 }
 
-private void selectStage(String stage) {
-    sh "oc project openshift-day-${stage}"
+private void selectStage(String stagename) {
+    sh "oc project openshift-day-${stagename}"
 }
 
 private void ocstage(String src, String dest) {

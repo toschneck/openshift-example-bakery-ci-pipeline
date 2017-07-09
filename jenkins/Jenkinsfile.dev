@@ -2,7 +2,8 @@
 skip = false
 // global var for routing nexus-repository through the script
 String gNEXUS_HOST = "not-defined"
-String STAGE = "dev"
+STAGENAME = "dev"
+
 stage('build maven artifacts') {
     //check ENV
     node() {
@@ -17,7 +18,7 @@ stage('build maven artifacts') {
     node('maven') {
         try {
             sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
-            selectStage(STAGE)
+            selectStage(STAGENAME)
             checkout scm
             if (!skip) {
                 sh "openshift/bakery-app/maven-build.sh ${gNEXUS_HOST}"
@@ -38,7 +39,7 @@ stage('build docker images') {
 //    }
     node() {
         checkout scm
-        selectStage(STAGE)
+        selectStage(STAGENAME)
         parallel web: {
             ocBakeryBuild('bakery-web-server')
         }, report: {
@@ -55,7 +56,7 @@ stage('Trigger QA') {
         input message: '==> trigger QA?'
     }
     node('') {
-        ocstage(STAGE, "qa")
+        ocstage(STAGENAME, "qa")
         //trigger next build pipeline
         sh "openshift/create-build-pipeline.sh qa"
     }
@@ -68,8 +69,8 @@ private void ocBakeryBuild(String component) {
     }
 }
 
-private void selectStage(String stage) {
-    sh "oc project openshift-day-${stage}"
+private void selectStage(String stagename) {
+    sh "oc project openshift-day-${stagename}"
 }
 
 private void ocstage(String src, String dest) {
