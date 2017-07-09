@@ -6,6 +6,8 @@ String STAGE = "prod"
 stage('deploy PROD system') {
     node('') {
         selectStage(STAGE)
+        checkout scm
+
         ocBakeryDeploy('bakery-web-server')
         ocBakeryDeploy('bakery-report-server')
         ocBakeryDeploy('bakery-workers')

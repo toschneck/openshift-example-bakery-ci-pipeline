@@ -7,6 +7,7 @@ String STAGE = "qa"
 stage('deploy QA system') {
     node('') {
         selectStage(STAGE)
+        checkout scm
         ocBakeryDeploy('bakery-web-server')
         ocBakeryDeploy('bakery-report-server')
         ocBakeryDeploy('bakery-workers')
@@ -27,6 +28,8 @@ stage('E2E Tests') {
             sh("echo -------------- Using IMAGE_PREFIX=${gIMAGE_PREFIX}")
         }
         selectStage(STAGE)
+
+        //build and start sakuli tests
         parallel sakulibuild: {
             ocSakuliBuild('sakuli-test')
         }, waitserver: {
@@ -60,7 +63,7 @@ stage('Trigger PROD') {
 private void ocBakeryDeploy(String component) {
     stage("deploy ${component}") {
         try {
-            sh "openshift/bakery-app/create_${component}.sh delete;"
+            sh "openshift/bakery-app/create_${component}.sh delete"
         } catch (e) {
             printf("only housekeeping, do nonting: %s", e.toString())
         }
