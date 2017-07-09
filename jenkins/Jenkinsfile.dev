@@ -75,5 +75,5 @@ private void selectStage(String stage) {
 private void ocstage(String src, String dest) {
     sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-report-server:latest"
     sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-web-server:latest"
-    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-worker-server:latest"
+    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-worker:latest"
 }
