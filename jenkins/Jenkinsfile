@@ -1,16 +1,19 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = true
 // global var for routing nexus-repository through the script
-String gNEXUS_HOST= "not-defined"
+String gNEXUS_HOST = "not-defined"
 
 stage('build maven artifacts') {
-    node(){
+    //check ENV
+    node() {
         gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
-        if (gNEXUS_HOST == "not-defined"){
+        if (gNEXUS_HOST == "not-defined") {
             errors "Environment varibale 'NEXUS_HOST' not specified correctly!"
         }
         sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
     }
+
+    //artifact builds
     node('maven') {
         try {
             sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
@@ -27,20 +30,20 @@ stage('build maven artifacts') {
         }
     }
 }
+
 stage('build docker images') {
 //    timeout(time: 2, unit: 'DAYS') {
 //        input message: '==> build images?'
 //    }
     node() {
         checkout scm
-        // need node maven because of which not installed in master
-//        parallel web: {
+        parallel web: {
             ocBakeryBuild('bakery-web-server')
-//        }, report: {
+        }, report: {
             ocBakeryBuild('bakery-report-server')
-//        }, worker: {
+        }, worker: {
             ocBakeryBuild('bakery-workers')
-//        }
+        }
     }
 }
 
@@ -48,39 +51,70 @@ stage('deploy DEV system') {
     timeout(time: 2, unit: 'DAYS') {
         input message: '==> deploy DEV system?'
     }
-//    parallel web: {
+    node('') {
         ocBakeryDeploy('bakery-web-server')
-//    }, report: {
         ocBakeryDeploy('bakery-report-server')
-//    }, worker: {
         ocBakeryDeploy('bakery-workers')
-//    }, activemq: {
         ocBakeryDeploy("activemq")
-//    }
-
+    }
 }
 stage('Test') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> start E2E tests system?'
+    }
+    node('') {
+        parallel sakulibuild: {
+            ocSakuliBuild('sakuli-test')
+        }, waitserver: {
+            ocSakuliBuild('wait-server')
+        }
+        sh "openshift/sakuli-tests/create_wait-server.sh"
+        ocSakuliDeploy('blueberry')
+        ocSakuliDeploy('caramel')
+        ocSakuliDeploy('chocolate')
+        ocSakuliDeploy('order-pdf')
+    }
 }
 
+stage('deploy QA system') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> deploy QA system?'
+    }
+    node('') {
+        sh "oc project openshift-day-qa"
+        ocBakeryDeploy('bakery-web-server')
+        ocBakeryDeploy('bakery-report-server')
+        ocBakeryDeploy('bakery-workers')
+        ocBakeryDeploy("activemq")
+    }
+}
 
 private void ocBakeryBuild(String component) {
     stage("build ${component} image") {
-//        node('maven') {
-            sh "openshift/bakery-app/create_${component}.sh build"
-//        }
+        sh "openshift/bakery-app/create_${component}.sh build"
     }
 }
+
 private void ocBakeryDeploy(String component) {
     stage("deploy ${component}") {
-        node('') {
-//            checkout scm
-            try {
-                sh "openshift/bakery-app/create_${component}.sh delete;"
-            } catch (e){
-                printf("only housekeeping, do nonting: %s", e.toString())
-            }
-            sh "openshift/bakery-app/create_${component}.sh"
+        try {
+            sh "openshift/bakery-app/create_${component}.sh delete;"
+        } catch (e) {
+            printf("only housekeeping, do nonting: %s", e.toString())
         }
+        sh "openshift/bakery-app/create_${component}.sh"
+    }
+}
+
+private void ocSakuliBuild(String component) {
+    stage("build ${component} image") {
+        sh "openshift/sakuli-tests/create_${component}.sh build"
+    }
+}
+
+private void ocSakuliDeploy(String component) {
+    stage("start ${component}") {
+        sh "openshift/sakuli-tests/create_sakuli-test.sh ${component}"
     }
 }
 
