@@ -62,6 +62,7 @@ function buildOpenshiftObject(){
         -v APP_NAME=$app_name \
         -v SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
         -v NEXUS_HOST=$NEXUS_HOST \
+        -v UPDATED="$(date +%Y-%m-%d_%H:%M:%S)" \
         | oc apply -f -
     oc start-build "$app_name" --follow --wait
     exit $?

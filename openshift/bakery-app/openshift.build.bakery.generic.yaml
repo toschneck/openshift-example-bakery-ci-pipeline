@@ -20,6 +20,8 @@ parameters:
 - name: NEXUS_HOST
   required: true
 # OPTIONAL
+- name: UPDATED
+  value: '2017-07-09_18:19:10'
 - name: SOURCE_DOCKER_CONTEXT_DIR
   description: Source Folder where the Dockerfile is placed example `docker`
   value: bakery-app
@@ -68,6 +70,8 @@ objects:
         env:
           - name: NEXUS_HOST
             value: "${NEXUS_HOST}"
+          - name: UPDATED
+            value: "${UPDATED}"
     output:
       to:
         kind: ImageStreamTag
