@@ -13,18 +13,33 @@ fi
 TEMPLATE=$FOLDER/delete.deployment.pipeline.yml
 count=0
 
+STAGE=$1
+if [[ $OS_DELETE_DEPLOYMENT == "true" ]] || [[ OS_BUILD_ONLY == "true" ]] ; then
+    STAGE=$2
+fi
+if [[ $STAGE == "" ]]; then
+    echo "define var 'STAGE'!"
+    exit -1
+fi
+echo "ENVS: STAGE=$STAGE"
 
 function createOpenshiftObject(){
     app_name=$1
     echo "CREATE Config for $app_name"
-    oc process -f "$TEMPLATE" -v APP_NAME=$app_name| oc apply -f -
+    oc process -f "$TEMPLATE" \
+        -v APP_NAME=$app_name \
+        -v STAGE=$STAGE \
+        | oc apply -f -
     oc get all -l application=$app_name
 }
 
 function deleteOpenshiftObject(){
     app_name=$1
     echo "DELETE Config for $app_name"
-    oc process -f "$TEMPLATE" -v APP_NAME=$app_name | oc delete -f -
+        oc process -f "$TEMPLATE" \
+        -v APP_NAME=$app_name \
+        -v STAGE=$STAGE \
+        | oc delete -f -
     echo ".... wait" && sleep 3
     oc delete pod -l jenkins=slave
 }
@@ -54,7 +69,7 @@ function deployToOpenshift() {
 
 }
 
-deployToOpenshift 'bakery-delete-ci'
+deployToOpenshift "bakery-delete-$STAGE-ci"
 
 wait
 exit $?

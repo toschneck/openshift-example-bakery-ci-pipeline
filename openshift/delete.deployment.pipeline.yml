@@ -4,6 +4,10 @@ metadata:
   creationTimestamp: null
   name: build-ci-delete
 parameters:
+#REQUIERD
+  - name: STAGE
+    required: true
+#OPTIONAL
   - name: APP_NAME
     required: true
     value: 'bakery-delete-ci'
@@ -51,17 +55,24 @@ objects:
       type: JenkinsPipeline
       jenkinsPipelineStrategy:
         jenkinsfile: |-
-          MODULE_PATH='.'
-          node('maven') {
-            stage ('Checkout') {
+          node('') {
+            stage ('checkout') {
               git branch: '${GIT_BRANCH}', url: '${GIT_URL}'
-              sh "ls -la ${MODULE_PATH}"
+              sh "ls -la ."
+              sh "oc project openshift-day-${STAGE}"
             }
-            stage ('trigger delete bakery-app') {
+            stage ('delete bakery-app') {
               sh "openshift/bakery-app/create_activemq.sh delete"
               sh "openshift/bakery-app/create_bakery-report-server.sh delete"
               sh "openshift/bakery-app/create_bakery-web-server.sh delete"
               sh "openshift/bakery-app/create_bakery-workers.sh delete"
+            }
+            stage ('delete ui-tests') {
+              sh "openshift/sakuli-tests/create_wait-server.sh delete"
+              sh "openshift/sakuli-tests/create_sakuli-test.sh delete blueberry"
+              sh "openshift/sakuli-tests/create_sakuli-test.sh delete caramel"
+              sh "openshift/sakuli-tests/create_sakuli-test.sh delete chocolate"
+              sh "openshift/sakuli-tests/create_sakuli-test.sh delete order-pdf"
             }
           }
     triggers:
