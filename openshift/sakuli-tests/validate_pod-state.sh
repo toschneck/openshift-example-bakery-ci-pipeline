@@ -4,7 +4,6 @@ cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 
 echo "ARGS: $1"
-IMAGE_NAME='sakuli-test-image'
 count=0
 maxval=100
 sleeper=5

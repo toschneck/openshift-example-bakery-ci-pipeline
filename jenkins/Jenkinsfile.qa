@@ -16,7 +16,7 @@ stage('deploy QA system') {
 }
 stage('E2E Tests') {
     timeout(time: 2, unit: 'DAYS') {
-        input message: '==> start E2E tests system?'
+        input message: '==> start E2E tests?'
     }
     node('') {
         //check ENV
@@ -73,13 +73,13 @@ private void ocBakeryDeploy(String component) {
 
 private void ocSakuliBuild(String component) {
     stage("build ${component} image") {
-        sh "openshift/sakuli-tests/create_${component}.sh build"
+        sh "STAGE=${STAGE} openshift/sakuli-tests/create_${component}.sh build"
     }
 }
 
 private void ocSakuliDeploy(String component) {
     stage("start ${component}") {
-        sh "openshift/sakuli-tests/create_sakuli-test.sh ${component}"
+        sh "STAGE=${STAGE} openshift/sakuli-tests/create_sakuli-test.sh ${component}"
     }
 }
 

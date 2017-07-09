@@ -14,11 +14,17 @@ if [[ $1 =~ build ]]; then
 fi
 
 ### add additional arguments
-if [ -z $IMAGE_PREFIX ]; then
-    #local openshift
-#    IMAGE_PREFIX='172.30.1.1:5000/openshift-day-dev'
+if [ -z $STAGE ]; then
+    STAGE=dev
+fi
+if [ -z $IMAGE_REG ]; then
     #consol openshift
-    IMAGE_PREFIX='172.30.1.1:5000/openshift-day-dev'
+    #IMAGE_REG="172.30.19.12:5000"
+    #local openshift
+    IMAGE_REG="172.30.1.1:5000"
+fi
+if [ -z $IMAGE_PREFIX ]; then
+    IMAGE_PREFIX="${IMAGE_REG}/openshift-day-${STAGE}"
 fi
 if [ -z $BAKERY_BAKERY_URL ]; then
     BAKERY_BAKERY_URL="http://bakery-web-server/bakery/"
@@ -32,10 +38,9 @@ SOURCE_DOCKERFILE='Dockerfile_ubuntu'
 TEMPLATE_BUILD=$FOLDER/openshift.sakuli.image.build.yaml
 TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.template.yaml
 
-echo "ENVS: IMAGE_PREFIX=$IMAGE_PREFIX, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD, TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
+echo "ENVS: STAGE=$STAGE, IMAGE_REG=$IMAGE_REG, IMAGE_PREFIX=$IMAGE_PREFIX, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD, TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
 
 count=0
-
 
 function deployOpenshiftObject(){
     app_name=$1
