@@ -54,6 +54,9 @@ stage('Trigger PROD') {
     }
     node('') {
         ocstage(STAGENAME, "prod")
+
+        //use dev jenkins
+        selectStage("dev")
         //trigger next build pipeline
         sh "openshift/create-build-pipeline.sh prod"
     }
