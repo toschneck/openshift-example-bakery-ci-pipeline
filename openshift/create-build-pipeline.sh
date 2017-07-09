@@ -13,7 +13,11 @@ if [[ $1 =~ build ]]; then
     OS_BUILD_ONLY=true
     STAGE=$2
 fi
-if [[ $STAGE == "" ]]; then STAGE="dev" ; fi
+if [[ $STAGE == "" ]]; then
+    echo "define var 'STAGE'!"
+    exit -1
+fi
+echo "ENVS: STAGE=$STAGE"
 
 TEMPLATE=$FOLDER/build.pipeline.yml
 count=0

@@ -35,7 +35,7 @@ objects:
     name: ${APP_NAME}
     labels:
       application: ${APP_NAME}
-      stage: dev
+      stage: ${STAGE}
   spec:
     nodeSelector: {}
     output: {}
