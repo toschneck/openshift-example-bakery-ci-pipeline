@@ -36,15 +36,15 @@ stage('E2E Tests') {
             ocSakuliBuild('wait-server')
         }
         sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
-        parallel blueberry: {
+//        parallel blueberry: {
             ocSakuliDeploy('blueberry')
-        }, caramel: {
+//        }, caramel: {
             ocSakuliDeploy('caramel')
-        }, chocolate: {
+//        }, chocolate: {
             ocSakuliDeploy('chocolate')
-        }, orderpdf: {
+//        }, orderpdf: {
             ocSakuliDeploy('order-pdf')
-        }
+//        }
     }
 }
 
