@@ -24,6 +24,8 @@ parameters:
   description: 'Internal Docker Registry of OpenShift server'
   ### as long as ImageStreams won't be supported in native Pods this is needed
   required: true
+- name: NEXUS_HOST
+  required: true
 ## OPTIONAL
 - description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <E2E_TEST_NAME-name>-<project>.<default-domain-suffix>'
   name: HOSTNAME_HTTP
@@ -59,8 +61,8 @@ objects:
           value: '350'
         - name: TZ
           value: 'Europe/Berlin'
-#        - name: KUBERNETES_RUN_MODE
-#          value: 'job'
+        - name: NEXUS_HOST
+          value: "${NEXUS_HOST}"
       args:
         ### make normal UI startup to connect via: oc rsh <pod-name> bash
 #        - --tail-log
@@ -69,6 +71,10 @@ objects:
         - /headless/sakuli/bakery/${E2E_TEST_NAME}
         # - -browser
         # - chrome
+        ### trigger upload of logs
+        - -postHook
+        - /headless/sakuli/bakery/upload-logs.sh
+        - ${E2E_TEST_NAME}
         ### set e.g. debug level
 #        - -D
 #        - log.level.sakuli=DEBUG
@@ -88,7 +94,7 @@ objects:
         timeoutSeconds: 1
       resources:
         limits:
-          cpu: 750m
+          cpu: 1000m
           memory: 2200Mi
 ### Service -> POD config
 - apiVersion: v1
