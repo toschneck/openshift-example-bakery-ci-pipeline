@@ -69,6 +69,7 @@ function deployToOpenshift() {
 
 }
 
+oc project openshift-day-dev
 deployToOpenshift "bakery-$STAGE-ci"
 
 wait
