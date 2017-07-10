@@ -3,15 +3,15 @@ set -e
 cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 
-SUITE=$1
-if [[ $SUITE == "" ]]; then
-    echo "no suite defined for uploads logs!"
+if [[ $E2E_TEST_NAME == "" ]]; then
+    echo "no 'E2E_TEST_NAME' defined for uploads logs!"
 fi
 if [ -z $NEXUS_HOST ] ;then
     echo "NEXUS_HOST not defined!"
     exit -1
 fi
 
+SUITE=$E2E_TEST_NAME
 CUR_DATE="$(date +%Y-%m-%d_%H-%M-%S)"
 ZIPNAME=$SUITE-$CUR_DATE.zip
 ART=${SUITE}-logs
