@@ -19,6 +19,21 @@ stage('deploy QA system') {
         }
     }
 }
+
+stage('Integration Tests') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> start Integration tests?'
+    }
+    node('') {
+        stage('citrus build') {
+            sh "echo execute oc citrus build"
+        }
+        stage('deploy citrus tests') {
+            sh "echo execute oc citrus test"
+        }
+    }
+}
+
 stage('E2E Tests') {
     timeout(time: 2, unit: 'DAYS') {
         input message: '==> start E2E tests?'
@@ -44,12 +59,12 @@ stage('E2E Tests') {
         sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
 
         parallel blueberry: {
-            ocSakuliDeploy('blueberry')
+            ocSakuliDeploy('chocolate')
         }, orderpdf: {
             ocSakuliDeploy('order-pdf')
-        }
-        parallel chocolate: {
-            ocSakuliDeploy('chocolate')
+        }, chocolate: {
+//        parallel chocolate: {
+            ocSakuliDeploy('blueberry')
         }, caramel: {
             ocSakuliDeploy('caramel')
         }
