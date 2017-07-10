@@ -1,0 +1,348 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.consol.citrus.samples</groupId>
+    <artifactId>citrus-bakery-it-tests</artifactId>
+    <version>1.1.0-SNAPSHOT</version>
+    <name>citrus-bakery-it-tests</name>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring.version>4.3.9.RELEASE</spring.version>
+        <apache.camel.version>2.19.1</apache.camel.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <testng.version>6.11</testng.version>
+        <citrus.version>2.7.2</citrus.version>
+        <jetty.version>9.4.6.v20170531</jetty.version>
+        <jetty.embedded.disabled>true</jetty.embedded.disabled>
+        <activemq.embedded.disabled>true</activemq.embedded.disabled>
+
+        <os.cluster.postfix>-openshift-day-qa.10.0.100.201.xip.io</os.cluster.postfix>
+
+        <activemq.server.host>activemq${os.cluster.postfix}</activemq.server.host>
+        <activemq.server.port>61616</activemq.server.port>
+        <bakery.server.host>bakery-web-server${os.cluster.postfix}</bakery.server.host>
+        <bakery.server.port>80</bakery.server.port>
+        <report.server.host>bakery-report-server${os.cluster.postfix}</report.server.host>
+        <report.server.port>80</report.server.port>
+
+    </properties>
+
+    <build>
+        <plugins>
+
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20</version>
+                <configuration>
+                    <forkMode>once</forkMode>
+                    <failIfNoTests>false</failIfNoTests>
+                    <excludes>
+                        <exclude>**/IT*.java</exclude>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                    <workingDirectory>${project.build.directory}</workingDirectory>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20</version>
+                <executions>
+                    <execution>
+                        <id>integration-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <!--<configuration>-->
+                            <!--<includes>-->
+                                <!--<include>**/*IT.java</include>-->
+                            <!--</includes>-->
+                        <!--</configuration>-->
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+        <!--<pluginManagement>-->
+        <!--<plugins>-->
+
+        <!--<plugin>-->
+        <!--<artifactId>maven-compiler-plugin</artifactId>-->
+        <!--<version>3.6.1</version>-->
+        <!--<configuration>-->
+        <!--<encoding>${project.build.sourceEncoding}</encoding>-->
+        <!--<source>1.8</source>-->
+        <!--<target>1.8</target>-->
+        <!--</configuration>-->
+        <!--</plugin>-->
+
+        <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-source-plugin</artifactId>-->
+        <!--<version>3.0.1</version>-->
+        <!--</plugin>-->
+        <!---->
+        <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-resources-plugin</artifactId>-->
+        <!--<version>3.0.1</version>-->
+        <!--</plugin>-->
+
+        <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-dependency-plugin</artifactId>-->
+        <!--<version>2.10</version>-->
+        <!--</plugin>-->
+
+        <!--<plugin>-->
+        <!--<groupId>org.codehaus.mojo</groupId>-->
+        <!--<artifactId>exec-maven-plugin</artifactId>-->
+        <!--<version>1.5.0</version>-->
+        <!--</plugin>-->
+
+        <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-shade-plugin</artifactId>-->
+        <!--<version>2.4.3</version>-->
+        <!--</plugin>-->
+        <!--</plugins>-->
+        <!--</pluginManagement>-->
+    </build>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test scoped dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <!-- Citrus -->
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-java-dsl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-ws</artifactId>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>com.consol.citrus</groupId>-->
+        <!--<artifactId>citrus-jms</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>com.consol.citrus</groupId>-->
+        <!--<artifactId>citrus-mail</artifactId>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>org.apache.activemq</groupId>-->
+        <!--<artifactId>activemq-broker</artifactId>-->
+        <!--</dependency>-->
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Camel Dependencies -->
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-core</artifactId>
+                <version>${apache.camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-spring</artifactId>
+                <version>${apache.camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-servlet</artifactId>
+                <version>${apache.camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-http</artifactId>
+                <version>${apache.camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-jackson</artifactId>
+                <version>${apache.camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-jms</artifactId>
+                <version>${apache.camel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-camel</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-broker</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jolokia</groupId>
+                <artifactId>jolokia-core</artifactId>
+                <version>1.3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4.7</version>
+            </dependency>
+
+            <!-- Spring Framework -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jms</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Test scoped dependencies -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng.version}</version>
+            </dependency>
+
+            <!-- Citrus -->
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-core</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-java-dsl</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-jms</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-http</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-ws</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-mail</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>consol-labs-snapshots</id>
+            <url>http://labs.consol.de/maven/snapshots-repository/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>interval:10080</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>
