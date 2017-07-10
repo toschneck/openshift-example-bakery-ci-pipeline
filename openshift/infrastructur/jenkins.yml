@@ -83,7 +83,7 @@ objects:
             timeoutSeconds: 3
           resources:
             limits:
-              memory: 512Mi
+              memory: 2048Mi
           securityContext:
             capabilities: {}
             privileged: false
