@@ -4,7 +4,7 @@ skip = false
 String gNEXUS_HOST = "not-defined"
 STAGENAME = "dev"
 
-stage('build maven artifacts') {
+stage('prepare build environment') {
     //check ENV
     node() {
         gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
@@ -13,7 +13,9 @@ stage('build maven artifacts') {
         }
         sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
     }
+}
 
+stage('build maven artifacts') {
     //artifact builds
     node('maven') {
         try {
