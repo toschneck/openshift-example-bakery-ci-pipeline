@@ -94,6 +94,7 @@ function placeCaramelOrder() {
 
 function validateHtmlReportView() {
     _highlight(_heading1("Cookie Bakery Reporting"));
+    env.sleep(3);
     clickHighlight(_link("Reload"));
     _highlight(_span("caramel"));
 

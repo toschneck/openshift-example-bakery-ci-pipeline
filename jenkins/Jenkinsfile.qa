@@ -45,13 +45,13 @@ stage('E2E Tests') {
 
         parallel blueberry: {
             ocSakuliDeploy('blueberry')
-        }, caramel: {
-            ocSakuliDeploy('caramel')
+        }, orderpdf: {
+            ocSakuliDeploy('order-pdf')
         }
         parallel chocolate: {
             ocSakuliDeploy('chocolate')
-        }, orderpdf: {
-            ocSakuliDeploy('order-pdf')
+        }, caramel: {
+            ocSakuliDeploy('caramel')
         }
     }
 }
