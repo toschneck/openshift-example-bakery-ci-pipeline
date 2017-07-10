@@ -7,7 +7,7 @@ ENV TZ=Europe/Berlin
 ## Install
 USER 0
 ### INSTALL zip, curl, masterpdf
-RUN yum install -y zip curl libsane-hpaio http://get.code-industry.net/public/master-pdf-editor-4.2.60_qt5.x86_64.rpm \
+RUN yum install -y zip curl libsane-hpaio http://get.code-industry.net/public/master-pdf-editor-4.2.63_qt5.x86_64.rpm \
     && yum clean all \
         && mkdir -p $HOME/.config/Code\ Industry \
         && echo "[General]" > $HOME/.config/Code\ Industry/Master\ PDF\ Editor.conf \
