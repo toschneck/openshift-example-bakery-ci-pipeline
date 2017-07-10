@@ -27,17 +27,13 @@ stage('Integration Tests') {
     node('') {
         selectStage(STAGENAME)
 
-        parallel citrusbuild: {
-            ocCitrusBuild("citrus-image")
-        }, waitserverbuild: {
-            ocWaitServerBuild('wait-server')
-        }
+        ocWaitServerBuild('wait-server')
         stage('deploy wait-server') {
             sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
         }
 
         stage('deploy citrus tests') {
-            sh "echo execute oc citrus test"
+            ocCitrusTests("citrus-tests")
         }
     }
 }
@@ -112,10 +108,11 @@ private void ocWaitServerBuild(String component) {
     }
 }
 
-private void ocCitrusBuild(String component) {
-    stage("build ${component} image") {
-//        TODO implement
+private void ocCitrusTests(String component) {
+    node('maven') {
         sh "echo execute oc citrus build"
+//            sh "mvn -f citrus-tests/pom.xml -Dos.cluster.postfix=-openshift-day-qa.10.0.100.201.xip.io verify"
+        sh "mvn -f citrus-tests/pom.xml verify"
     }
 }
 
