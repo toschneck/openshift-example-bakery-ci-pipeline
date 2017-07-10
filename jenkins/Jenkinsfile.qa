@@ -25,9 +25,17 @@ stage('Integration Tests') {
         input message: '==> start Integration tests?'
     }
     node('') {
-        stage('citrus build') {
-            sh "echo execute oc citrus build"
+        selectStage(STAGENAME)
+
+        parallel citrusbuild: {
+            ocCitrusBuild("citrus-image")
+        }, waitserverbuild: {
+            ocWaitServerBuild('wait-server')
         }
+        stage('deploy wait-server') {
+            sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
+        }
+
         stage('deploy citrus tests') {
             sh "echo execute oc citrus test"
         }
@@ -50,14 +58,7 @@ stage('E2E Tests') {
         selectStage(STAGENAME)
 
         //build and start sakuli tests
-        parallel sakulibuild: {
-            ocSakuliBuild('sakuli-test')
-        }, waitserver: {
-            ocSakuliBuild('wait-server')
-        }
-
-        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
-
+        ocSakuliBuild('sakuli-test')
         parallel blueberry: {
             ocSakuliDeploy('chocolate')
         }, orderpdf: {
@@ -102,6 +103,19 @@ private void ocBakeryDeploy(String component) {
 private void ocSakuliBuild(String component) {
     stage("build ${component} image") {
         sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_${component}.sh build"
+    }
+}
+
+private void ocWaitServerBuild(String component) {
+    stage("build ${component} image") {
+        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_${component}.sh build"
+    }
+}
+
+private void ocCitrusBuild(String component) {
+    stage("build ${component} image") {
+//        TODO implement
+        sh "echo execute oc citrus build"
     }
 }
 
