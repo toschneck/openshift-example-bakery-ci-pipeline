@@ -4,6 +4,17 @@ skip = true
 String gIMAGE_PREFIX = "not-defined"
 STAGENAME = "qa"
 
+stage('prepare build environment') {
+    //check ENV
+    node() {
+        gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
+        if (gNEXUS_HOST == "not-defined") {
+            errors "Environment varibale 'NEXUS_HOST' not specified correctly!"
+        }
+        sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
+    }
+}
+
 stage('deploy QA system') {
     node('') {
         selectStage(STAGENAME)
@@ -113,7 +124,8 @@ private void ocCitrusTests(String component) {
     node('maven') {
         sh "echo execute oc citrus build"
         checkout scm
-            sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -f citrus-tests/pom.xml -Dos.cluster.postfix=-openshift-day-qa.paas.osp.consol.de verify"
+        sh "citrus-test/maven-build.sh ${gNEXUS_HOST}"
+//            sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -f citrus-tests/pom.xml verify"
 //        sh "mvn -f citrus-tests/pom.xml verify"
     }
 }
