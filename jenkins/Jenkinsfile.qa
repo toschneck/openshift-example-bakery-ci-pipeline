@@ -113,7 +113,7 @@ private void ocCitrusTests(String component) {
     node('maven') {
         sh "echo execute oc citrus build"
         checkout scm
-            sh "mvn -f citrus-tests/pom.xml -Dos.cluster.postfix=-openshift-day-qa.paas.osp.consol.de verify"
+            sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -f citrus-tests/pom.xml -Dos.cluster.postfix=-openshift-day-qa.paas.osp.consol.de verify"
 //        sh "mvn -f citrus-tests/pom.xml verify"
     }
 }
