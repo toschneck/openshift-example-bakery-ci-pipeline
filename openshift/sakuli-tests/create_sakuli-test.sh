@@ -61,7 +61,7 @@ function deployOpenshiftObject(){
     $FOLDER/validate_pod-state.sh $app_name
     exitcode=$?
     echo "-------------------------------------------------------------------"
-    exit $?
+    exit $exitcode
 }
 
 function deleteOpenshiftObject(){
