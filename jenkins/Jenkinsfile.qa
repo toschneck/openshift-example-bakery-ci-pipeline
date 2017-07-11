@@ -124,7 +124,7 @@ private void ocCitrusTests(String component) {
     node('maven') {
         sh "echo execute oc citrus build"
         checkout scm
-        sh "citrus-test/maven-build.sh ${gNEXUS_HOST}"
+        sh "citrus-tests/maven-build.sh ${gNEXUS_HOST}"
 //            sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -f citrus-tests/pom.xml verify"
 //        sh "mvn -f citrus-tests/pom.xml verify"
     }
