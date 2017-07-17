@@ -1,7 +1,20 @@
-Demo Web Application "Backery"
-==============================
+# Automated CI/CD Build Pipeline with Jenkis in OpenShift
 
----------
+The GitHub repository [toschneck/openshift-example-bakery-ci-pipeline](https://github.com/toschneck/openshift-example-bakery-ci-pipeline) contains, the sourcecode for the examples of the talk **[Continuous Testing: Integration- und UI-Testing mit OpenShift-Build-Pipelines](https://www.slideshare.net/TobiasSchneck/continuous-testing-integration-und-uitesting-mit-openshiftbuildpipelines)** at the Redhat/ConSol OpenShift-Day:
+
+[![Continuous Testing](.markdownpics/slide_first_page_1.png)](https://www.slideshare.net/TobiasSchneck/continuous-testing-integration-und-uitesting-mit-openshiftbuildpipelines)
+
+
+The example shows, how we can setup up total automated build pipeline with following components:
+
+* [OpenShift Build Pipelines](https://docs.openshift.com/container-platform/3.5/install_config/configuring_pipeline_execution.html) 
+* [Jenkinsfile](https://jenkins.io/doc/book/pipeline/jenkinsfile/)
+* [Docker](https://www.docker.com/)
+* [Maven](http://maven.apache.org/)
+* [Citrus](https://github.com/christophd/citrus)
+* [Sakuli](https://github.com/ConSol/sakuli)
+
+## Demo Web Application "Backery"
 
 The cookie bakery demo sample application uses a multi module Maven project with each module being deployed in a separate
 Docker container. The modules are:
@@ -10,140 +23,186 @@ Docker container. The modules are:
 * worker
 * report
 
+![](.markdownpics/bakery_app.png)
 
-Using this example with Docker
-------------------------------
-
-Lets build the
-sample Docker application images by calling:
+The final application will uses some Docker images, which will be loaded from DockerHub repository for Java, Tomcat, ActiveMQ and so on. After the startup, the application will have the following Docker containers:
 
 ```
-mvn -f bakery-app/pom.xml clean package
-```
-
-Now you will be able to see some more docker images on your host.
-
-```
-docker images
-```
-
-Now you are able to lunch the application and running the Sakuli End-2-End-Tests. Therefor you have two ways to do this, using **maven** or **docker-compose**.
-This may take a while when executed for the first time as Docker images will be loaded from DockerHub repository for Java,
-Tomcat, ActiveMQ and so on. After that you will then see some Docker containers started on your host
-
-```
-docker ps
-```
-
-You will see Docker containers running on your host:
-
 * bakery-web-server
 * report-server
 * activemq-server
 * worker-chocolate
 * worker-blueberry
 * worker-caramel
-
-
-### Using docker-compose
-To lunch the hole application from scratch just execute the following script:
-
-```
-bakery-app/app-deployment-docker-compose/deploy_app.sh
 ```
 
-After the bakery application is fully running, you can execute the Sakuli E2E tests. The docker-compose config you will find under the folder `sakuli-tests/docker-compose.yml`. To start **all** tests in one glance just execute:
+## Create the OpenShift infrastructure
 
+First you have to login at your running openshift, like this:
+
+    oc login -u developer -p developer --insecure-skip-tls-verify=true https://MYHOST:8443
+    
+If you doesn't have an existing installation use [MiniShift](https://github.com/minishift/minishift) or create a local cluster with the command:
+
+    mkdir -p $OSENV
+    echo "create oc cluster for $OSENV"
+    oc cluster up \
+    	 --use-existing-config \
+    	 --host-config-dir=$OSENV/config \
+    	--host-data-dir=$OSENV/data \
+    	--host-pv-dir=$OSENV/vol \
+    	--public-hostname=$(hostname)
+
+### Deploy Nexus Registry
+
+First of all we need a working Nexus registry, where we can deploy our maven artifacts and cache some dependency packages. If you doesn't have one, you can create on be the following commands directly in our OpenShift cluster:
+
+    oc new-project nexus
+    openshift/infrastructur/nexus/create-nexus.sh
+    
+After the deployment is successful you will get a new Nexus. Please note the URL how you can access it. On my local OpenShift cluster it is: `nexus-nexus.10.0.6.193.xip.io`
+     
+ 
+### Create Project Infrastructure and Jenkins Server
+Before you deploy the whole infrastructure we need to configure the following environment variables:
+
+**1) `NEXUS_HOST`:**
+
+Use the hostname of te nexus repository you wan't to use. In the example above it is `nexus-nexus.10.0.100.201.xip.io`, so execute:
+    
+    oc describe route nexus | grep -i request
+    Requested Host:		nexus-nexus.10.0.6.193.xip.io
+    
+    export NEXUS_HOST=nexus-nexus.10.0.6.193.xip.io
+        
+**2) `IMAGE_REG`:**
+As long as OpenShift can only use ImageStream names in DeploymentConfigs and not at normal POD definitions, we have specify the internal used image registry:
+
+    oc get is
+    NAME      DOCKER REPO                   TAGS      UPDATED
+    nexus     172.30.1.1:5000/nexus/nexus   2.14.4    5 minutes ago
+    
+    export IMAGE_REG=172.30.1.1:5000
+
+Now execute the script [`openshift/create-openshift-pipeline-infrastructur.sh`](openshift/create-openshift-pipeline-infrastructur.sh) and the following openshift objects will created:
+
+* One project for each stage: `openshift-day-dev`, `openshift-day-qa`, `openshift-day-prod`
+* Service-Accounts `cd-agent`, `jenkins` to be able to trigger deployments in all stages 
+* Jenkins Server 
+
+***[OpenShift Build Pipeline - Part 01 - Build up Infrastructure (Nexus, Stages, Jenkins)](https://www.youtube.com/watch?v=rEye-wXsiA8)***
+[![OpenShift Build Pipeline - Part 01 - Build up Infrastructure (Nexus, Stages, Jenkins)](https://img.youtube.com/vi/rEye-wXsiA8/0.jpg)](https://www.youtube.com/watch?v=rEye-wXsiA8)
+
+
+## Create DEV Build Pipeline
+
+![Dev Stage](.markdownpics/dev_stage.png)
+
+Now it is time create our first Jenkins Pipeline, so execute:
+
+    openshift/create-build-pipeline.sh dev
+    
+This script will use the build config stored in [`openshift/build.pipeline.yml`](openshift/build.pipeline.yml), [`jenkins/Jenkinsfile.dev`](jenkins/Jenkinsfile.dev) to start a new CI/CD pipeline with the following components:
+
+* Maven build with Unit-Tests and WAR/JAR files as artifacts
+* Docker Images matching to the maven artifacts
+
+***[OpenShift Build Pipeline - Part 02 - Building Artifacts (Maven, Docker Images)](https://www.youtube.com/watch?v=4FgA6mya12M)***
+[![OpenShift Build Pipeline - Part 02 - Building Artifacts (Maven, Docker Images)](https://img.youtube.com/vi/4FgA6mya12M/0.jpg)](https://www.youtube.com/watch?v=4FgA6mya12M)
+
+## QA Stage
+
+In the next chapter we try to create the following build pipeline, which ensures a successful deployment, integration test and end-2-end test:
+![QA Stage](.markdownpics/qa_stage.png)
+
+### Deploy QA System
+
+The next step in the build pipeline is the deployment of our QA stage. If the above CI-Pipeline have been executed successfully it, OpenShift will ask you to proceed the build, (see video).
+The second possibility is to trigger it by hand: 
+
+    openshift/create-build-pipeline.sh qa    
+
+The build will trigger the deployment config stored in [`openshift/build.pipeline.yml`](openshift/build.pipeline.yml), [`jenkins/Jenkinsfile.qa`](jenkins/Jenkinsfile.qa) and the final OpenShift DeploymentConfig files:
+
+* [`openshift/bakery-app/openshift.deploy.activemq.yaml`](openshift/bakery-app/openshift.deploy.activemq.yaml).
+* [`openshift/bakery-app/openshift.deploy.web.yaml`](openshift/bakery-app/openshift.deploy.web.yaml).
+* [`openshift/bakery-app/openshift.deploy.worker.yaml`](openshift/bakery-app/openshift.deploy.worker.yaml).
+
+
+***[OpenShift Build Pipeline - Part 03 - Deploy QA Stage (OpenShift Deployment)](https://www.youtube.com/watch?v=DErkWvy4oOE)***
+[![OpenShift Build Pipeline - Part 03 - Deploy QA Stage (OpenShift Deployment))](https://img.youtube.com/vi/DErkWvy4oOE/0.jpg)](https://www.youtube.com/watch?v=DErkWvy4oOE)
+
+
+### Execute Citrus Integration Tests
+
+The execution will start after the Deployment, as soon as you confirm the execution:
+![confirm integration tests](.markdownpics/input_integration_test.png)
+
+Before Citrus can test the server API, we will check with a small "waiting container", that the application is up and running. The corresponding configuration files are:
+
+* [`bakery-app/app-deployment-docker-compose/wait-for-server/Dockerfile`](bakery-app/app-deployment-docker-compose/wait-for-server/Dockerfile)
+* [`openshift/sakuli-tests/openshift.wait.pod.run.template.yaml`](openshift/sakuli-tests/openshift.wait.pod.run.template.yaml)
+
+After the bakery application is reachable, the build will execute the citrus maven build:
+
+* [`jenkins/Jenkinsfile.qa`](jenkins/Jenkinsfile.qa:47) 
+* [`citrus-tests/pom.xml`](citrus-tests/pom.xml)
+
+***[OpenShift Build Pipeline - Part 04 - Citrus Integration Tests (Testing the REST API)](https://www.youtube.com/watch?v=OR58k_oot9A)***
+[![OpenShift Build Pipeline - Part 04 - Citrus Integration Tests (Testing the REST API)](https://img.youtube.com/vi/OR58k_oot9A/0.jpg)](https://www.youtube.com/watch?v=OR58k_oot9A)
+
+
+### Execute Sakuli End-2-End Tests
+The execution will start after the integration test phase, as soon as you confirm the execution:
+![confirm e2e tests](.markdownpics/input_e2e_test.png)
+
+The  [`jenkins/Jenkinsfile.qa`](jenkins/Jenkinsfile.qa:68), and [`openshift/sakuli-tests/openshift.sakuli.pod.run.template.yaml`](openshift/sakuli-tests/openshift.sakuli.pod.run.template.yaml) will now trigger 4 parallel UI tests which are defined at:
+
+* [`sakuli-tests/blueberry`](sakuli-tests/blueberry)
+* [`sakuli-tests/caramel`](sakuli-tests/caramel)
+* [`sakuli-tests/chocolate`](sakuli-tests/chocolate)
+* [`sakuli-tests/order-pdf`](sakuli-tests/order-pdf)
+
+If your resources of the cluster is limited you can change the execution to 2 in parallel like follow:
+
+```groovy
+//Jekinsfile.qa:68
+        //build and start sakuli tests
+        ocSakuliBuild('sakuli-test')
+        
+        parallel blueberry: {
+            ocSakuliDeploy('blueberry')
+        }, orderpdf: {
+            ocSakuliDeploy('order-pdf')
+        }
+        
+        parallel chocolate: {
+            ocSakuliDeploy('chocolate')
+        }, caramel: {
+            ocSakuliDeploy('caramel')
+        }
 ```
-sakuli-tests/execute_all.sh
-```
-To start **one** specific tests, you can define the environment variable `TESTSUITE` and execute the script `execute_compose_test.sh`:
+Now you can open the Overview page [vnc_verview_local_oc_cluster.html](vnc_overview_local_oc_cluster.html). Maybe you have to change the openshift cluster prefix URL to get the result showing:
+The second possibility is to open the specific route and password `sakuli`:
+![Sakuli Route](.markdownpics/sakuli_route.png)
 
-```
-TESTSUITE='order-pdf' sakuli-tests/execute_compose_test.sh
-```
+During the execution of the test you should be now able to look into the containers:
+ 
 
-### Using maven
+***[OpenShift Build Pipeline - Part 05 - Sakuli End-2-End Tests (Testing Web and PDF Content)](https://www.youtube.com/watch?v=g37pvgKDiKo)***
+[![OpenShift Build Pipeline - Part 05 - Sakuli End-2-End Tests (Testing Web and PDF Content)](https://img.youtube.com/vi/g37pvgKDiKo/0.jpg)](https://www.youtube.com/watch?v=g37pvgKDiKo)
 
-To lunch the **application only**, just use the maven module `app-deployment-maven`:
+To be able to locate some errors, Sakuli will take a screenshot and store it into the defined Nexus. 
 
-```
-mvn -f bakery-app/app-deployment-maven/pom.xml clean verify
-```
+***[OpenShift Build Pipeline - Part 06 - Sakuli End-2-End Tests (Error Handling)](https://www.youtube.com/watch?v=qygyc_4FfCY)***
+[![OpenShift Build Pipeline - Part 06 - Sakuli End-2-End Tests (Error Handling)](https://img.youtube.com/vi/qygyc_4FfCY/0.jpg)](https://www.youtube.com/watch?v=qygyc_4FfCY)
 
-To execute the **application and the Sakuli UI tests** in a glance, use the maven module `sakuli-tests-maven`:
+## PROD Stage
 
-```
-mvn -f bakery-app/sakuli-tests-maven/pom.xml clean verify
-```
+After all steps above are finished with success can deploy the app the prod project, be accepting the input question or trigger the build manual:
 
-### Watch into the Sakuli-Container via VNC
+    openshift/create-build-pipeline.sh prod    
 
-Now you are able to watch the Sakuli tests running over VNC (Ports `5911 - 5914`) or over the web vnc client, open [vnc_overview_local.html](vnc_overview_local.html)
+***[OpenShift Build Pipeline - Part 07 -  Productive Deployment](https://www.youtube.com/watch?v=mWxnRQv-iN8)***
+[![OpenShift Build Pipeline - Part 07 -  Productive Deployment](https://img.youtube.com/vi/mWxnRQv-iN8/0.jpg)](https://www.youtube.com/watch?v=mWxnRQv-iN8)
 
-![](.markdownpics/vnc_bakery_test.png)
-
-
-Starting the example via Jenkins CI:
-------------------------------------
-This example also povides an Jenkins configured CI-Job to show how easily it is to include Sakuli tests in your own CI-Build. For this go the folder `jenkins`,
-start Jenkins via **docker-compose** and go to the site http://localhost:8080/.
-
-```
-jenkins/deploy_jenkins.sh
-```
-
-After the Jenkins docker-container is running, you will be able to execute the Job [CI_docker_compose_bakery_application](http://localhost:8080/job/CI_docker_compose_bakery_application/)
-
-![](.markdownpics/ci_sakuli_job.png)
-
-For better visualization, go to the view `docker-compose` and look at build pipeline. There you will see, that the job
-[CI_docker_compose_bakery_application](http://localhost:8080/job/CI_docker_compose_bakery_application/) will start four sub-jobs starting with the name `Sakuli_Test*`.
-As long as the `Sakuli_Test*` are running, you can take again a look into the container via the VNC overview page [vnc_overview_local.html](vnc_overview_local.html).
-
-![](.markdownpics/ci_build_pipeline.png)
-
-Starting the example as continuous E2E monitoring check (OMD nagios)
---------------------------------------------------------------------
-**1) start OMD monitoring server**
-
-```
-omd-nagios/deploy_omd.sh
-```
-Now open your browser and enter the URL https://localhost:8043/demo/thruk/#cgi-bin/status.cgi?host=all and you will find an overview over the 4 monitoring checks `blueberry`, `caramel`, `chocolate` and `order-pdf`. As soon the OMD server will get new results they will be displayed there.
-
-![](.markdownpics/omd-nagios.png)
-
-**2) start monitoring checks**
-
-```
-sakuli-tests/execute_all_4_monitoring.sh
-```
-The script will execute all four implemented Sakuli tests as monitoring checks and send the result to already running OMD server. The script will repeat the test execution after a break of 15 seconds as long as the script didn't get stopped. To stop the script execution simply press `CTRL + C`.
-
-- - -
-
-### Docker machine user
-
-This sample is using Docker as infrastructure for starting up the services in separate containers. The sample application
-makes use of Docker environment variables and hsit name settings that need to be set befoer using the application. Non-Linux
-users might want to add dockerhost to your /etc/hosts configuration in order to simply access the
-services running in Docker containers without any port forwarding:
-
-```
-echo $(docker-machine ip your-docker-machine-name) dockerhost | sudo tee -a /etc/hosts
-```
-
-In the parent Maven POM you will find properties pointing to the dockerhost.
-
-```
-<docker.host.name>dockerhost</docker.host.name>
-```
-
-You might want to adjust these properties by adding following parameters to the Maven commands shown in this readme:
-
-```
--Ddocker.host.name=dockerHostName
-```
-
-Now you can build the Docker containers. Be sure that Docker is setup and running on your local machine.
