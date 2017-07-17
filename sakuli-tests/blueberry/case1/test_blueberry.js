@@ -36,7 +36,7 @@ try {
 
 
     _navigateTo($bakeryURL);
-    visibleHighlight(_paragraph("Place XXXXXXXX orders:"));
+    visibleHighlight(_paragraph("Place new orders:"));
     adjustAmount();
     testCase.endOfStep("move amount slider", 40);
 
