@@ -70,9 +70,7 @@ stage('E2E Tests') {
             ocSakuliDeploy('chocolate')
         }, orderpdf: {
             ocSakuliDeploy('order-pdf')
-        }
-
-        parallel chocolate: {
+        }, chocolate: {
             ocSakuliDeploy('blueberry')
         }, caramel: {
             ocSakuliDeploy('caramel')
