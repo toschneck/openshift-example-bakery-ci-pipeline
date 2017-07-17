@@ -67,11 +67,11 @@ stage('E2E Tests') {
         //build and start sakuli tests
         ocSakuliBuild('sakuli-test')
         parallel blueberry: {
-            ocSakuliDeploy('chocolate')
+            ocSakuliDeploy('blueberry')
         }, orderpdf: {
             ocSakuliDeploy('order-pdf')
         }, chocolate: {
-            ocSakuliDeploy('blueberry')
+            ocSakuliDeploy('chocolate')
         }, caramel: {
             ocSakuliDeploy('caramel')
         }
