@@ -69,7 +69,7 @@ function deployToOpenshift() {
 
 }
 
-oc project openshift-day-dev
+oc project ta-pipeline-dev
 deployToOpenshift "bakery-delete-$STAGE-ci"
 
 wait

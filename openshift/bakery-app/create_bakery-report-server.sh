@@ -13,7 +13,7 @@ if [[ $1 =~ build ]]; then
     OS_BUILD_ONLY=true
 fi
 if [ -z  $NEXUS_HOST ]; then
-    NEXUS_HOST="nexus-nexus.paas.osp.consol.de"
+    NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
 fi
 
 

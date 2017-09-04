@@ -56,7 +56,7 @@ stage('E2E Tests') {
     node('') {
         //check ENV
         node() {
-            gIMAGE_PREFIX = sh(script: 'echo ${IMAGE_REG}/openshift-day-qa', returnStdout: true)
+            gIMAGE_PREFIX = sh(script: 'echo ${IMAGE_REG}/ta-pipeline-qa', returnStdout: true)
             if (gIMAGE_PREFIX == "not-defined") {
                 errors "Environment varibale 'IMAGE_PREFIX' not specified correctly!"
             }
@@ -135,7 +135,7 @@ private void ocSakuliDeploy(String component) {
 }
 
 private void selectStage(String stagename) {
-    sh "oc project openshift-day-${stagename}"
+    sh "oc project ta-pipeline-${stagename}"
 }
 
 private void ocstage(String src, String dest) {

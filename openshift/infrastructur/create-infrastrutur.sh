@@ -6,17 +6,17 @@ echo "ARGS: $1"
 
 if [ -z  $NEXUS_HOST ]; then
     #local openshift
-#        IMAGE_PREFIX='172.30.1.1:5000'
-#    NEXUS_HOST="nexus-nexus.10.0.100.201.xip.io"
-    # consol nexus
-    NEXUS_HOST="nexus-nexus.paas.osp.consol.de"
+    #IMAGE_PREFIX='172.30.1.1:5000'
+    NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
+    #consol nexus
+    #NEXUS_HOST="nexus-ta-nexus.paasint.consol.de"
 fi
 
 if [ -z $IMAGE_REG ]; then
     #local openshift
-#    IMAGE_PREFIX='172.30.1.1:5000'
+    IMAGE_PREFIX='172.30.1.1:5000'
     #consol openshift
-    IMAGE_REG='172.30.19.12:5000'
+    #IMAGE_REG='172.30.19.12:5000'
 fi
 
 if [[ $1 =~ delete ]]; then

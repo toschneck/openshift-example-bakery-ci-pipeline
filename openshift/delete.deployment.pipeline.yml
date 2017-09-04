@@ -59,7 +59,7 @@ objects:
             stage ('checkout') {
               git branch: '${GIT_BRANCH}', url: '${GIT_URL}'
               sh "ls -la ."
-              sh "oc project openshift-day-${STAGE}"
+              sh "oc project ta-pipeline-${STAGE}"
             }
             stage ('delete bakery-app') {
               sh "openshift/bakery-app/create_activemq.sh delete"

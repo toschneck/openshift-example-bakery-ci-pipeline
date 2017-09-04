@@ -57,10 +57,10 @@ If you doesn't have an existing installation use [MiniShift](https://github.com/
 
 First of all we need a working Nexus registry, where we can deploy our maven artifacts and cache some dependency packages. If you doesn't have one, you can create on be the following commands directly in our OpenShift cluster:
 
-    oc new-project nexus
+    oc new-project ta-nexus
     openshift/infrastructur/nexus/create-nexus.sh
     
-After the deployment is successful you will get a new Nexus. Please note the URL how you can access it. On my local OpenShift cluster it is: `nexus-nexus.10.0.6.193.xip.io`
+After the deployment is successful you will get a new Nexus. Please note the URL how you can access it. On my local OpenShift cluster it is: `nexus-ta-nexus.10.0.6.193.xip.io`
      
  
 ### Create Project Infrastructure and Jenkins Server
@@ -68,12 +68,12 @@ Before you deploy the whole infrastructure we need to configure the following en
 
 **1) `NEXUS_HOST`:**
 
-Use the hostname of te nexus repository you wan't to use. In the example above it is `nexus-nexus.10.0.100.201.xip.io`, so execute:
+Use the hostname of te nexus repository you wan't to use. In the example above it is `nexus-ta-nexus.10.0.100.201.xip.io`, so execute:
     
     oc describe route nexus | grep -i request
-    Requested Host:		nexus-nexus.10.0.6.193.xip.io
+    Requested Host:		nexus-ta-nexus.10.0.6.193.xip.io
     
-    export NEXUS_HOST=nexus-nexus.10.0.6.193.xip.io
+    export NEXUS_HOST=nexus-ta-nexus.10.0.6.193.xip.io
         
 **2) `IMAGE_REG`:**
 As long as OpenShift can only use ImageStream names in DeploymentConfigs and not at normal POD definitions, we have specify the internal used image registry:
@@ -86,7 +86,7 @@ As long as OpenShift can only use ImageStream names in DeploymentConfigs and not
 
 Now execute the script [`openshift/create-openshift-pipeline-infrastructur.sh`](openshift/create-openshift-pipeline-infrastructur.sh) and the following openshift objects will created:
 
-* One project for each stage: `openshift-day-dev`, `openshift-day-qa`, `openshift-day-prod`
+* One project for each stage: `ta-pipeline-dev`, `ta-pipeline-qa`, `ta-pipeline-prod`
 * Service-Accounts `cd-agent`, `jenkins` to be able to trigger deployments in all stages 
 * Jenkins Server 
 

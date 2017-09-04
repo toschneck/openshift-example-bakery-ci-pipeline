@@ -7,7 +7,7 @@ echo "ARGS: $1 $2 $3"
 SOURCE_STAGE=$1
 TARGET_STAGE=$2
 IMAGE_NAME=$3
-PROJECT_PREFIX=openshift-day
+PROJECT_PREFIX=ta-pipeline
 
 echo "source stage: $SOURCE_STAGE"
 echo "target stage: $TARGET_STAGE"

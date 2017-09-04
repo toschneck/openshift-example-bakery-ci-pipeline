@@ -5,7 +5,7 @@ FOLDER=$(pwd)
 echo "ARGS: $1"
 
 echo "============= USE PROJECT NEXUS =================="
-oc project nexus
+oc project ta-nexus
 if [[ $1 =~ delete ]]; then
     echo "============= DELETE NEXUS =================="
     oc process -f $FOLDER/nexus2-persistent-template.yaml | oc delete -f -

@@ -27,7 +27,7 @@ private void ocBakeryDeploy(String component) {
 }
 
 private void selectStage(String stagename) {
-    sh "oc project openshift-day-${stagename}"
+    sh "oc project ta-pipeline-${stagename}"
 }
 
 private void ocstage(String src, String dest) {

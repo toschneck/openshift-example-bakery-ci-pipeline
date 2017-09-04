@@ -12,7 +12,16 @@ if [ -z $NEXUS_HOST ] ;then
     echo "NEXUS_HOST not defined!"
     exit -1
 fi
+#
+#export OC_CLUSTER_POSTFIX=${OC_CLUSTER_POSTFIX:-$1}
+#if [ -z $OC_CLUSTER_POSTFIX ] ;then
+#    echo "OC_CLUSTER_POSTFIX not defined!"
+#    exit -1
+#fi
+#
+#echo "............. OC_CLUSTER_POSTFIX=$OC_CLUSTER_POSTFIX"
 echo "............. NEXUS_HOST=$NEXUS_HOST"
 
-echo "mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml -Dos.cluster.postfix=-openshift-day-qa.paas.osp.consol.de verify"
-mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml -Dos.cluster.postfix=-openshift-day-qa.paas.osp.consol.de verify
+set -x
+mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml verify
+#mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml -Dos.cluster.postfix=$OC_CLUSTER_POSTFIX verify

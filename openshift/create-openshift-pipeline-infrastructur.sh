@@ -7,7 +7,7 @@ echo "ARGS: $1"
 
 function checkDefaults(){
     if [ -z $PROJECT_BASENAME ]; then
-        export PROJECT_BASENAME='openshift-day'
+        export PROJECT_BASENAME='ta-pipeline'
     fi
 }
 checkDefaults

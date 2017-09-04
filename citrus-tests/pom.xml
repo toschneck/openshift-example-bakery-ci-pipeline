@@ -20,7 +20,7 @@
         <jetty.embedded.disabled>true</jetty.embedded.disabled>
         <activemq.embedded.disabled>true</activemq.embedded.disabled>
 
-        <os.cluster.postfix>-openshift-day-qa.10.0.100.201.xip.io</os.cluster.postfix>
+        <os.cluster.postfix>-ta-pipeline-qa.10.0.100.201.xip.io</os.cluster.postfix>
 
         <activemq.server.host>activemq${os.cluster.postfix}</activemq.server.host>
         <activemq.server.port>61616</activemq.server.port>

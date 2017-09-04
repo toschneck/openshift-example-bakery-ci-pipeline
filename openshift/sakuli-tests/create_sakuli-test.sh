@@ -24,10 +24,10 @@ if [ -z $IMAGE_REG ]; then
     IMAGE_REG="172.30.1.1:5000"
 fi
 if [ -z $NEXUS_HOST ]; then
-    NEXUS_HOST="nexus-nexus.paas.osp.consol.de"
+    NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
 fi
 if [ -z $IMAGE_PREFIX ]; then
-    IMAGE_PREFIX="${IMAGE_REG}/openshift-day-${STAGE}"
+    IMAGE_PREFIX="${IMAGE_REG}/ta-pipeline-${STAGE}"
 fi
 if [ -z $BAKERY_BAKERY_URL ]; then
     BAKERY_BAKERY_URL="http://bakery-web-server/bakery/"
