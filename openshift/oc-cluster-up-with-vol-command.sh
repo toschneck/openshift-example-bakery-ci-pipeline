@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
+
 if [ -z $OSENV ]; then
     OSENV="$HOME/apps/oc/data/ta-pipeline"
 fi
+
+if [[ $1 == 'stop' ]] ; then
+    oc cluster down
+    exit $?
+fi
+if [[ $1 == 'delete' ]] ; then
+    oc cluster down
+    sudo rm -rf $OSENV
+    exit $?
+fi
+
 mkdir -p $OSENV/config
 mkdir -p $OSENV/data
 mkdir -p $OSENV/vol
