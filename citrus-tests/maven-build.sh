@@ -13,15 +13,15 @@ if [ -z $NEXUS_HOST ] ;then
     exit -1
 fi
 #
-#export OC_CLUSTER_POSTFIX=${OC_CLUSTER_POSTFIX:-$1}
-#if [ -z $OC_CLUSTER_POSTFIX ] ;then
+if [ -z $OC_CLUSTER_POSTFIX ] ;then
+    export OC_CLUSTER_POSTFIX="-ta-pipeline-qa.${NEXUS_HOST#*.}" # postfix after nexus host: works only if nexus is in cluster
 #    echo "OC_CLUSTER_POSTFIX not defined!"
 #    exit -1
-#fi
+fi
 #
-#echo "............. OC_CLUSTER_POSTFIX=$OC_CLUSTER_POSTFIX"
+echo "............. OC_CLUSTER_POSTFIX=$OC_CLUSTER_POSTFIX"
 echo "............. NEXUS_HOST=$NEXUS_HOST"
 
 set -x
-mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml verify
-#mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml -Dos.cluster.postfix=$OC_CLUSTER_POSTFIX verify
+#mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml verify
+mvn -s $FOLDER/../openshift/infrastructur/maven-cd-settings.xml -f $FOLDER/pom.xml -Dos.cluster.postfix=$OC_CLUSTER_POSTFIX verify
