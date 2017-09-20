@@ -76,6 +76,9 @@ objects:
               scheme: HTTP
             initialDelaySeconds: 10
             timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 250m
     triggers:
     - type: ImageChange
       imageChangeParams:

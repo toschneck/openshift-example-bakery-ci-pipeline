@@ -95,7 +95,7 @@ objects:
         timeoutSeconds: 1
       resources:
         limits:
-          cpu: 1000m
+          cpu: 500m
           memory: 2200Mi
 ### Service -> POD config
 - apiVersion: v1

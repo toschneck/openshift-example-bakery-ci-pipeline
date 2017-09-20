@@ -91,6 +91,9 @@ objects:
 #              scheme: HTTPS
 #            initialDelaySeconds: 10
 #            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 100m
     triggers:
     - type: "ConfigChange"
     - type: ImageChange

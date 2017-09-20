@@ -83,6 +83,9 @@ objects:
               port: 61616
             initialDelaySeconds: 5
             timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 250m
     triggers:
     - type: ImageChange
       imageChangeParams:
