@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
-set -x
+
 echo "ARGS: $1"
 if [[ $1 = delete-all ]]; then
     OS_DELETE_ALL=true
