@@ -69,6 +69,10 @@ try {
     //open pdf and validate
     appPDF = openPdfFile(pdfFilePath);
     env.sleep($sleep4Prasentation);
+    var warn = screen.exists("masterpdf_update_warning", 5);
+    if (warn){
+        warn.highlight().click().type(Key.ESC);
+    }
     screen.waitForImage("pdf_order_header", 30).highlight();
     [
         "pdf_blueberry",
