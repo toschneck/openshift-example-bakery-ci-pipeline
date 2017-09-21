@@ -67,11 +67,11 @@ function deployOpenshiftObject(){
 function deleteOpenshiftObject(){
     app_name=$1
     echo "DELETE Config for $app_name"
-    oc delete dc -l "application=$app_name"  --now
-    oc delete deployment -l "application=$app_name"  --now
-    oc delete pods -l "application=$app_name"  --now
-    oc delete service -l "application=$app_name"  --now
-    oc delete route -l "application=$app_name"  --now
+    oc delete dc -l "application=$app_name"  del--now --force
+    oc delete deployment -l "application=$app_name"  --now --force
+    oc delete pods -l "application=$app_name"  --now --force
+    oc delete service -l "application=$app_name"  --now --force
+    oc delete route -l "application=$app_name"  --now --force
     echo "-------------------------------------------------------------------"
 
 }

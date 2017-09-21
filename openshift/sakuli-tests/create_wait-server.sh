@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
-
+set -x
 echo "ARGS: $1"
 if [[ $1 = delete-all ]]; then
     OS_DELETE_ALL=true
@@ -47,7 +47,7 @@ count=0
 function deployOpenshiftObject(){
     app_name=$1
     echo "CREATE DEPLOYMENT for $app_name"
-    oc delete pods -l "application=$app_name"  --grace-period=0
+    oc delete pods -l "application=$app_name" --now --force
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
         -v IMAGE_PREFIX=$IMAGE_PREFIX \
@@ -65,11 +65,11 @@ function deployOpenshiftObject(){
 function deleteOpenshiftObject(){
     app_name=$1
     echo "DELETE Config for $app_name"
-    oc delete dc -l "application=$app_name"  --now
-    oc delete deployment -l "application=$app_name"  --now
-    oc delete pods -l "application=$app_name"  --now
-    oc delete service -l "application=$app_name"  --now
-    oc delete route -l "application=$app_name"  --now
+    oc delete dc -l "application=$app_name"  --now --force
+    oc delete deployment -l "application=$app_name"  --now --force
+    oc delete pods -l "application=$app_name"  --now --force
+    oc delete service -l "application=$app_name"  --now --force
+    oc delete route -l "application=$app_name"  --now --force
     echo "-------------------------------------------------------------------"
 
 }
