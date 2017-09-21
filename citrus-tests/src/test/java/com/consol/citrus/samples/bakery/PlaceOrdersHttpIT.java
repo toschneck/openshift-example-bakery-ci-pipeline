@@ -60,7 +60,7 @@ public class PlaceOrdersHttpIT extends TestNGCitrusTestDesigner {
                     return index > 20;
                 }
             })
-            .autoSleep(100L)
+            .autoSleep(1000L)
             .actions(http().client(reportingClient)
                             .send()
                             .get("/reporting/order")
@@ -95,7 +95,7 @@ public class PlaceOrdersHttpIT extends TestNGCitrusTestDesigner {
                     return index > 20;
                 }
             })
-            .autoSleep(100L)
+            .autoSleep(1000L)
             .actions(http().client(reportingClient)
                             .send()
                             .get("/reporting/order")
@@ -130,7 +130,7 @@ public class PlaceOrdersHttpIT extends TestNGCitrusTestDesigner {
                     return index > 20;
                 }
             })
-            .autoSleep(100L)
+            .autoSleep(1000L)
             .actions(http().client(reportingClient)
                             .send()
                             .get("/reporting/order")
