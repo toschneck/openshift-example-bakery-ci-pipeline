@@ -28,6 +28,7 @@ stage('deploy QA system') {
         }, workers: {
             ocBakeryDeploy('bakery-workers')
         }
+        ocWaitServerBuild('wait-server')
     }
 }
 
@@ -38,7 +39,6 @@ stage('Integration Tests') {
     node('') {
         selectStage(STAGENAME)
 
-        ocWaitServerBuild('wait-server')
         stage('deploy wait-server') {
             sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
         }
@@ -99,6 +99,7 @@ private void ocBakeryDeploy(String component) {
     stage("deploy ${component}") {
         try {
             sh "openshift/bakery-app/create_${component}.sh delete"
+            sh "echo 'wait 10 sec. ...' && sleep 10"
         } catch (e) {
             printf("only housekeeping, do nonting: %s", e.toString())
         }
