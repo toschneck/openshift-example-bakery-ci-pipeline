@@ -22,7 +22,7 @@ function deployOpenshiftObject(){
     oc delete pods -l "application=$app_name"  --grace-period=0
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
-        -v CITRUS_TEST_NAME=$app_name \
+        -p CITRUS_TEST_NAME=$app_name \
         | oc apply -f -
 
     $FOLDER/../sakuli-tests/validate_pod-state.sh $app_name

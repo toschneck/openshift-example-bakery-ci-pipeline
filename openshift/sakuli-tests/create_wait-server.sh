@@ -50,10 +50,10 @@ function deployOpenshiftObject(){
     oc delete pods -l "application=$app_name" --now --force
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
-        -v IMAGE_PREFIX=$IMAGE_PREFIX \
-        -v APP_NAME=$app_name \
-        -v BAKERY_REPORT_URL=$BAKERY_REPORT_URL \
-        -v BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL \
+        -p IMAGE_PREFIX=$IMAGE_PREFIX \
+        -p APP_NAME=$app_name \
+        -p BAKERY_REPORT_URL=$BAKERY_REPORT_URL \
+        -p BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL \
         | oc apply -f -
     
     $FOLDER/validate_pod-state.sh $app_name
@@ -79,9 +79,9 @@ function buildOpenshiftObject(){
     oc delete builds -l application=$IMAGE_NAME
 
     oc process -f "$TEMPLATE_BUILD" \
-        -v IMAGE=$IMAGE_NAME \
-        -v SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
-        -v SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
+        -p IMAGE=$IMAGE_NAME \
+        -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
+        -p SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
         | oc apply -f -
     oc start-build "$IMAGE_NAME" --follow --wait
     exit $?
@@ -89,9 +89,9 @@ function buildOpenshiftObject(){
 function buildDeleteOpenshiftObject(){
     echo "Trigger DELETE Build for $IMAGE_NAME"
     oc process -f "$TEMPLATE_BUILD" \
-        -v IMAGE=$IMAGE_NAME \
-        -v SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
-        -v SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
+        -p IMAGE=$IMAGE_NAME \
+        -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
+        -p SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
         | oc delete -f -
     echo "-------------------------------------------------------------------"
 }

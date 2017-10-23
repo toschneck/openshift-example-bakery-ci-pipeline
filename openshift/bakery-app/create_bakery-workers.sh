@@ -29,9 +29,9 @@ function deployOpenshiftObject(){
     app_costs=$3
     echo "CREATE DEPLOYMENT for $app_name [type=$app_type]"
     oc process -f "$TEMPLATE_DEPLOY" \
-        -v APP_NAME=$app_name \
-        -v APP_TYPE=$app_type \
-        -v APP_COSTS=$app_costs \
+        -p APP_NAME=$app_name \
+        -p APP_TYPE=$app_type \
+        -p APP_COSTS=$app_costs \
         | oc apply -f -
     echo ".... " && sleep 2
     oc get all -l application=$app_name
@@ -57,10 +57,10 @@ function buildOpenshiftObject(){
     oc delete builds -l application=$app_name
 
     oc process -f "$TEMPLATE_BUILD" \
-        -v APP_NAME=$app_name \
-        -v SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
-        -v NEXUS_HOST=$NEXUS_HOST \
-        -v UPDATED="$(date +%Y-%m-%d_%H:%M:%S)" \
+        -p APP_NAME=$app_name \
+        -p SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
+        -p NEXUS_HOST=$NEXUS_HOST \
+        -p UPDATED="$(date +%Y-%m-%d_%H:%M:%S)" \
         | oc apply -f -
     oc start-build "$app_name" --follow --wait
     exit $?
@@ -69,8 +69,8 @@ function buildDeleteOpenshiftObject(){
     app_name=$1
     echo "Trigger DELETE Build for $app_name"
     oc process -f "$TEMPLATE_BUILD" \
-        -v APP_NAME=$app_name \
-        -v SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
+        -p APP_NAME=$app_name \
+        -p SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
         | oc delete -f -
     echo "-------------------------------------------------------------------"
 }

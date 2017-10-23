@@ -27,8 +27,8 @@ function createOpenshiftObject(){
     app_name=$1
     echo "CREATE Config for $app_name"
     oc process -f "$TEMPLATE" \
-        -v APP_NAME=$app_name \
-        -v STAGE=$STAGE \
+        -p APP_NAME=$app_name \
+        -p STAGE=$STAGE \
         | oc apply -f -
     oc get all -l application=$app_name
 }
@@ -37,8 +37,8 @@ function deleteOpenshiftObject(){
     app_name=$1
     echo "DELETE Config for $app_name"
         oc process -f "$TEMPLATE" \
-        -v APP_NAME=$app_name \
-        -v STAGE=$STAGE \
+        -p APP_NAME=$app_name \
+        -p STAGE=$STAGE \
         | oc delete -f -
     echo ".... wait" && sleep 3
     oc delete pod -l jenkins=slave

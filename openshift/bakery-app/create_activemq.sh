@@ -24,7 +24,7 @@ function deployOpenshiftObject(){
     app_name=$1
     echo "CREATE DEPLOYMENT for $app_name"
     oc process -f "$TEMPLATE_DEPLOY" \
-        -v APP_NAME=$app_name \
+        -p APP_NAME=$app_name \
         | oc apply -f -
     echo ".... " && sleep 2
     oc get all -l application=$app_name
@@ -48,7 +48,7 @@ function buildDeleteOpenshiftObject(){
     app_name=$1
     echo "Trigger DELETE Build for $app_name"
     oc process -f "$TEMPLATE_DEPLOY" \
-        -v APP_NAME=$app_name \
+        -p APP_NAME=$app_name \
         | oc delete -f -
     echo "-------------------------------------------------------------------"
 }

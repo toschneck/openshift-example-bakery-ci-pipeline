@@ -22,8 +22,8 @@ fi
 if [[ $1 =~ delete ]]; then
     echo "============= DELETE INFRASTRUCTUR =================="
     oc process -f $FOLDER/jenkins.yml \
-        -v NEXUS_HOST=${NEXUS_HOST} \
-        -v IMAGE_REG=${IMAGE_REG} \
+        -p NEXUS_HOST=${NEXUS_HOST} \
+        -p IMAGE_REG=${IMAGE_REG} \
         | oc delete -f -
     echo "tried to delete not persistent content"
     if [[ $1 =~ delete-all ]]; then
@@ -39,6 +39,6 @@ echo "IMAGE_REG=${IMAGE_REG}"
 
 oc process -f $FOLDER/jenkins.persistent.yml | oc apply -f - \
     && oc process -f $FOLDER/jenkins.yml \
-            -v NEXUS_HOST=${NEXUS_HOST} \
-            -v IMAGE_REG=${IMAGE_REG} \
+            -p NEXUS_HOST=${NEXUS_HOST} \
+            -p IMAGE_REG=${IMAGE_REG} \
             | oc apply -f -
