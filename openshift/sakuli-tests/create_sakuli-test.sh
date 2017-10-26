@@ -41,7 +41,7 @@ if [ -z $IMAGE_NAME ]; then
     # determine the correct image_name for the k8s objects
     # no longer needed since https://docs.openshift.com/container-platform/3.6/dev_guide/managing_images.html#referencing-images-in-image-streams
     # but currently not enabled on the ConSol cluster
-    IMAGE_NAME=$(oc get is -l application=$image_selector -o yaml | grep dockerImageRepository | awk '{print $2}')
+    IMAGE_NAME=$(oc get is -l application=$IMAGE_SELECTOR -o yaml | grep dockerImageRepository | awk '{print $2}')
 fi
 if [ -z $BAKERY_BAKERY_URL ]; then
     BAKERY_BAKERY_URL="http://bakery-web-server/bakery/"
@@ -54,7 +54,7 @@ echo "ENVS: STAGE=$STAGE, GIT_BRANCH=$GIT_BRANCH, IMAGE_NAME=$IMAGE_NAME, SOURCE
       BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD,
       TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
 
-count=0
+count=1
 
 function deployOpenshiftObject(){
     app_name=$1
@@ -95,8 +95,8 @@ function buildOpenshiftObject(){
         -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
         -p SOURCE_REPOSITORY_REF=$GIT_BRANCH \
         | oc apply -f -
-#    oc start-build "$IMAGE_NAME" --follow --wait
-    tempfixBuild $IMAGE_NAME
+#    oc start-build "$IMAGE_SELECTOR" --follow --wait
+    tempfixBuild $IMAGE_SELECTOR
     excode=$?
     echo "EXIT BUILD: $excode"
     exit $excode

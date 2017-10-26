@@ -47,7 +47,7 @@ function deployOpenshiftObject(){
     oc delete pods -l "application=$app_name" --now --force
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
-        -p IMAGE_NAME=IMAGE_NAME \
+        -p IMAGE_NAME=$IMAGE_NAME \
         -p APP_NAME=$app_name \
         -p BAKERY_REPORT_URL=$BAKERY_REPORT_URL \
         -p BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL \
@@ -80,9 +80,27 @@ function buildOpenshiftObject(){
         -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
         -p SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
         | oc apply -f -
-    oc start-build "$IMAGE_NAME" --follow --wait
-    exit $?
+#    oc start-build "$IMAGE_SELECTOR" --follow --wait
+    tempfixBuild $IMAGE_SELECTOR
+    excode=$?
+    echo "EXIT BUILD: $excode"
+    exit $excode
 }
+
+# needed as long bug is not fixed: https://github.com/openshift/origin/issues/17019
+function tempfixBuild(){
+    app_name=$1
+    echo "+oc start-build "$app_name" --follow --wait > logs.$app_name.txt"
+    oc start-build "$app_name" --follow --wait > logs.$app_name.txt
+    excode=$?
+    echo "EXIT BUILD: $excode"
+    cat logs.$app_name.txt
+    if [[ $excode == 1 ]] ; then
+       cat logs.$app_name.txt | grep -i "Push successful" && echo "change exitcode to 0" && return 0
+    fi
+    return $excode
+}
+
 function buildDeleteOpenshiftObject(){
     echo "Trigger DELETE Build for $IMAGE_SELECTOR"
     oc process -f "$TEMPLATE_BUILD" \

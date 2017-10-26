@@ -94,6 +94,7 @@ function buildDeleteOpenshiftObject(){
     oc process -f "$TEMPLATE_BUILD" \
         -p APP_NAME=$app_name \
         -p SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
+        -p NEXUS_HOST=$NEXUS_HOST \
         | oc delete -f -
     echo "-------------------------------------------------------------------"
 }
