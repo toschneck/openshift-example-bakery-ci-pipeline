@@ -1,17 +1,14 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = true
-// global var for get internal registry
-String gIMAGE_PREFIX = "not-defined"
 STAGENAME = "qa"
 
 stage('prepare build environment') {
     //check ENV
     node() {
-        gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
-        if (gNEXUS_HOST == "not-defined") {
-            errors "Environment varibale 'NEXUS_HOST' not specified correctly!"
+        if ("${NEXUS_HOST}" == '') {
+            errors "No Nexus Repository defined! check environment variable 'NEXUS_HOST'"
         }
-        sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
+        printf("-------------- Using NEXUS_HOST=${NEXUS_HOST}")
     }
 }
 
@@ -54,14 +51,6 @@ stage('E2E Tests') {
         input message: '==> start E2E tests?'
     }
     node('') {
-        //check ENV
-        node() {
-            gIMAGE_PREFIX = sh(script: 'echo ${IMAGE_REG}/ta-pipeline-qa', returnStdout: true)
-            if (gIMAGE_PREFIX == "not-defined") {
-                errors "Environment varibale 'IMAGE_PREFIX' not specified correctly!"
-            }
-            sh("echo -------------- Using IMAGE_PREFIX=${gIMAGE_PREFIX}")
-        }
         selectStage(STAGENAME)
 
         //build and start sakuli tests
@@ -123,7 +112,7 @@ private void ocCitrusTests(String component) {
     node('maven') {
         sh "echo execute oc citrus build"
         checkout scm
-        sh "citrus-tests/maven-build.sh ${gNEXUS_HOST}"
+        sh "citrus-tests/maven-build.sh ${NEXUS_HOST}"
 //            sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -f citrus-tests/pom.xml verify"
 //        sh "mvn -f citrus-tests/pom.xml verify"
     }

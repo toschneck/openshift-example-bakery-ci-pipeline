@@ -13,18 +13,21 @@ if [[ $1 =~ build ]]; then
     OS_BUILD_ONLY=true
 fi
 
+### DEFAULTS:
+IMAGE_SELECTOR='wait-server'
+SOURCE_DOCKERFILE='Dockerfile'
+SOURCE_DOCKER_CONTEXT_DIR='bakery-app/app-deployment-docker-compose/wait-for-server'
+TEMPLATE_BUILD=$FOLDER/openshift.sakuli.image.build.yaml
+TEMPLATE_DEPLOY=$FOLDER/openshift.wait.pod.run.template.yaml
 ### add additional arguments
 if [ -z $STAGE ]; then
     STAGE=dev
 fi
-if [ -z $IMAGE_REG ]; then
-    #consol openshift
-    #IMAGE_REG="172.30.19.12:5000"
-    #local openshift
-    IMAGE_REG="172.30.1.1:5000"
-fi
-if [ -z $IMAGE_PREFIX ]; then
-    IMAGE_PREFIX="${IMAGE_REG}/ta-pipeline-${STAGE}"
+if [ -z $IMAGE_NAME ]; then
+    # determine the correct image_name for the k8s objects
+    # no longer needed since https://docs.openshift.com/container-platform/3.6/dev_guide/managing_images.html#referencing-images-in-image-streams
+    # but currently not enabled on the ConSol cluster
+    IMAGE_NAME=$(oc get is -l application=$IMAGE_SELECTOR -o yaml | grep dockerImageRepository | awk '{print $2}')
 fi
 if [ -z $BAKERY_BAKERY_URL ]; then
     BAKERY_BAKERY_URL="http://bakery-web-server/bakery/"
@@ -33,13 +36,7 @@ if [ -z $BAKERY_REPORT_URL ]; then
     BAKERY_REPORT_URL="http://bakery-report-server/report/"
 fi
 
-IMAGE_NAME='wait-server'
-SOURCE_DOCKERFILE='Dockerfile'
-SOURCE_DOCKER_CONTEXT_DIR='bakery-app/app-deployment-docker-compose/wait-for-server'
-TEMPLATE_BUILD=$FOLDER/openshift.sakuli.image.build.yaml
-TEMPLATE_DEPLOY=$FOLDER/openshift.wait.pod.run.template.yaml
-
-echo "ENVS: STAGE=$STAGE, IMAGE_REG=$IMAGE_REG, IMAGE_PREFIX=$IMAGE_PREFIX, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE, SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR, BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD, TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
+echo "ENVS: STAGE=$STAGE, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE, SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR, BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD, TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
 
 count=0
 
@@ -50,7 +47,7 @@ function deployOpenshiftObject(){
     oc delete pods -l "application=$app_name" --now --force
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
-        -p IMAGE_PREFIX=$IMAGE_PREFIX \
+        -p IMAGE_NAME=IMAGE_NAME \
         -p APP_NAME=$app_name \
         -p BAKERY_REPORT_URL=$BAKERY_REPORT_URL \
         -p BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL \
@@ -75,11 +72,11 @@ function deleteOpenshiftObject(){
 }
 
 function buildOpenshiftObject(){
-    echo "Trigger Build for $IMAGE_NAME"
-    oc delete builds -l application=$IMAGE_NAME
+    echo "Trigger Build for $IMAGE_SELECTOR"
+    oc delete builds -l application=$IMAGE_SELECTOR
 
     oc process -f "$TEMPLATE_BUILD" \
-        -p IMAGE=$IMAGE_NAME \
+        -p IMAGE=$IMAGE_SELECTOR \
         -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
         -p SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
         | oc apply -f -
@@ -87,9 +84,9 @@ function buildOpenshiftObject(){
     exit $?
 }
 function buildDeleteOpenshiftObject(){
-    echo "Trigger DELETE Build for $IMAGE_NAME"
+    echo "Trigger DELETE Build for $IMAGE_SELECTOR"
     oc process -f "$TEMPLATE_BUILD" \
-        -p IMAGE=$IMAGE_NAME \
+        -p IMAGE=$IMAGE_SELECTOR \
         -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
         -p SOURCE_DOCKER_CONTEXT_DIR=$SOURCE_DOCKER_CONTEXT_DIR \
         | oc delete -f -
@@ -113,7 +110,7 @@ function triggerOpenshift() {
     ((count++))
 
 }
-SER_NAME=$IMAGE_NAME
+SER_NAME=$IMAGE_SELECTOR
 triggerOpenshift
 
 wait

@@ -16,7 +16,7 @@ fi
 
 if [[ $1 == 'delete' ]] ; then
     stop
-    sudo rm -rf $OSENV
+    sudo rm -rfv $OSENV
     exit $?
 fi
 

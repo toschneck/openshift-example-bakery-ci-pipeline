@@ -19,12 +19,9 @@ parameters:
   required: true
 - name: BAKERY_REPORT_URL
   required: true
-- name: IMAGE_PREFIX
-  description: 'Internal Docker Registry of OpenShift server'
+- name: IMAGE_NAME
+  description: 'Internal Docker Imagename of OpenShift server'
   ### as long as ImageStreams won't be supported in native Pods this is needed
-  required: true
-## OPTIONAL
-- name: IMAGE
   required: true
   value: wait-server:latest
 ### Configuration of OpenShift objects
@@ -44,7 +41,7 @@ objects:
     terminationGracePeriodSeconds: 5
     containers:
     - name: ${APP_NAME}
-      image: ${IMAGE_PREFIX}/${IMAGE}
+      image: ${IMAGE_NAME}
       imagePullPolicy: Always
       env:
         - name: BAKERY_REPORT_URL

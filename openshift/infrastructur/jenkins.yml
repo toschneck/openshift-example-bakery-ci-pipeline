@@ -9,10 +9,6 @@ parameters:
     value: jenkins
   - name: HOSTNAME_HTTP
     description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
-  - name: NEXUS_HOST
-    required: true
-  - name: IMAGE_REG
-    required: true
 objects:
 - apiVersion: v1
   kind: DeploymentConfig
@@ -51,10 +47,6 @@ objects:
             value: "true"
           - name: JNLP_SERVICE_NAME
             value: jenkins-jnlp
-          - name:  NEXUS_HOST
-            value: "${NEXUS_HOST}"
-          - name:  IMAGE_REG
-            value: "${IMAGE_REG}"
           - name: TZ
             value: 'Europe/Berlin'
           serviceAccount: jenkins
@@ -83,7 +75,7 @@ objects:
             timeoutSeconds: 3
           resources:
             limits:
-              memory: 2048Mi
+              memory: 512Mi
           securityContext:
             capabilities: {}
             privileged: false

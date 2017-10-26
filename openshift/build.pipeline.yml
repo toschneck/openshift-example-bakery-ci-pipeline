@@ -52,6 +52,11 @@ objects:
       type: JenkinsPipeline
       jenkinsPipelineStrategy:
         jenkinsfilePath: "jenkins/Jenkinsfile.${STAGE}"
+        env:
+        - name: "NEXUS_HOST"
+          value: "${NEXUS_HOST}"
+        - name: "GIT_BRANCH"
+          value: "${GIT_BRANCH}"
     triggers:
     - github:
         secret: ${GITHUB_WEBHOOK_SECRET}

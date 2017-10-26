@@ -7,11 +7,10 @@ STAGENAME = "dev"
 stage('prepare build environment') {
     //check ENV
     node() {
-        gNEXUS_HOST = sh(script: 'echo $NEXUS_HOST', returnStdout: true)
-        if (gNEXUS_HOST == "not-defined") {
-            errors "Environment varibale 'NEXUS_HOST' not specified correctly!"
+        if ("${NEXUS_HOST}" == '') {
+            errors "No Nexus Repository defined! check environment variable 'NEXUS_HOST'"
         }
-        sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
+        printf("-------------- Using NEXUS_HOST=${NEXUS_HOST}")
     }
 }
 
@@ -19,11 +18,11 @@ stage('build maven artifacts') {
     //artifact builds
     node('maven') {
         try {
-            sh("echo -------------- Using NEXUS_HOST=${gNEXUS_HOST}")
+            printf("-------------- Using NEXUS_HOST=${NEXUS_HOST}")
             selectStage(STAGENAME)
             checkout scm
             if (!skip) {
-                sh "openshift/bakery-app/maven-build.sh ${gNEXUS_HOST}"
+                sh "openshift/bakery-app/maven-build.sh ${NEXUS_HOST}"
             } else {
                 printf("Skipped maven build!!!")
             }

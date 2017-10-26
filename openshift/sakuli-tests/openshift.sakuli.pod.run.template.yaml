@@ -20,17 +20,14 @@ parameters:
   required: true
 - name: BAKERY_REPORT_URL
   required: true
-- name: IMAGE_PREFIX
-  description: 'Internal Docker Registry of OpenShift server'
-  ### as long as ImageStreams won't be supported in native Pods this is needed
-  required: true
-- name: NEXUS_HOST
+- description: 'URL of the NEXUS server - will be store the build artifacts like screenshots'
+  name: NEXUS_HOST
   required: true
 ## OPTIONAL
 - description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <E2E_TEST_NAME-name>-<project>.<default-domain-suffix>'
   name: HOSTNAME_HTTP
-- description: 'Sakuli End-2-End image, see `docker search sakuli`'
-  name: IMAGE
+- description: 'Sakuli End-2-End image (see `docker search sakuli`) or internal build docker image of openshift'
+  name: IMAGE_NAME
   required: true
   value: sakuli-test-image:latest
 ### Configuration of OpenShift objects
@@ -50,7 +47,7 @@ objects:
     terminationGracePeriodSeconds: 5
     containers:
     - name: ${E2E_TEST_NAME}
-      image: ${IMAGE_PREFIX}/${IMAGE}
+      image: ${IMAGE_NAME}
       imagePullPolicy: Always
       env:
         - name: BAKERY_REPORT_URL

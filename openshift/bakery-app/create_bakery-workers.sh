@@ -15,6 +15,10 @@ fi
 if [ -z  $NEXUS_HOST ]; then
     NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
 fi
+if [ -z $GIT_BRANCH ]; then
+    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+fi
+
 
 
 TEMPLATE_BUILD=$FOLDER/openshift.build.bakery.generic.yaml
@@ -59,6 +63,7 @@ function buildOpenshiftObject(){
     oc process -f "$TEMPLATE_BUILD" \
         -p APP_NAME=$app_name \
         -p SOURCE_DOCKERFILE=$BUILD_DOCKERFILE \
+        -p SOURCE_REPOSITORY_REF=$GIT_BRANCH \
         -p NEXUS_HOST=$NEXUS_HOST \
         -p UPDATED="$(date +%Y-%m-%d_%H:%M:%S)" \
         | oc apply -f -
