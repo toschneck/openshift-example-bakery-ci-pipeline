@@ -67,9 +67,27 @@ function buildOpenshiftObject(){
         -p NEXUS_HOST=$NEXUS_HOST \
         -p UPDATED="$(date +%Y-%m-%d_%H:%M:%S)" \
         | oc apply -f -
-    oc start-build "$app_name" --follow --wait
-    exit $?
+#    oc start-build "$app_name" --follow --wait
+    tempfixBuild $app_name
+    excode=$?
+    echo "EXIT BUILD: $excode"
+    exit $excode
 }
+
+# needed as long bug is not fixed: https://github.com/openshift/origin/issues/17019
+function tempfixBuild(){
+    app_name=$1
+    echo "+oc start-build "$app_name" --follow --wait > logs.$app_name.txt"
+    oc start-build "$app_name" --follow --wait > logs.$app_name.txt
+    excode=$?
+    echo "EXIT BUILD: $excode"
+    cat logs.$app_name.txt
+    if [[ $excode == 1 ]] ; then
+       cat logs.$app_name.txt | grep -i "Push successful" && echo "change exitcode to 0" && return 0
+    fi
+    return $excode
+}
+
 function buildDeleteOpenshiftObject(){
     app_name=$1
     echo "Trigger DELETE Build for $app_name"

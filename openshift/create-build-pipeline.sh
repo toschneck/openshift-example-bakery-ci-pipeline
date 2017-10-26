@@ -51,6 +51,7 @@ function deleteOpenshiftObject(){
         oc process -f "$TEMPLATE" \
         -p APP_NAME=$app_name \
         -p STAGE=$STAGE \
+        -p NEXUS_HOST=$NEXUS_HOST \
         | oc delete -f -
     echo ".... wait" && sleep 3
     oc delete pod -l jenkins=slave

@@ -95,9 +95,27 @@ function buildOpenshiftObject(){
         -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
         -p SOURCE_REPOSITORY_REF=$GIT_BRANCH \
         | oc apply -f -
-    oc start-build "$IMAGE_NAME" --follow --wait
-    exit $?
+#    oc start-build "$IMAGE_NAME" --follow --wait
+    tempfixBuild $IMAGE_NAME
+    excode=$?
+    echo "EXIT BUILD: $excode"
+    exit $excode
 }
+
+# needed as long bug is not fixed: https://github.com/openshift/origin/issues/17019
+function tempfixBuild(){
+    app_name=$1
+    echo "+oc start-build "$app_name" --follow --wait > logs.$app_name.txt"
+    oc start-build "$app_name" --follow --wait > logs.$app_name.txt
+    excode=$?
+    echo "EXIT BUILD: $excode"
+    cat logs.$app_name.txt
+    if [[ $excode == 1 ]] ; then
+       cat logs.$app_name.txt | grep -i "Push successful" && echo "change exitcode to 0" && return 0
+    fi
+    return $excode
+}
+
 function buildDeleteOpenshiftObject(){
     echo "Trigger DELETE Build for $IMAGE_SELECTOR"
     oc process -f "$TEMPLATE_BUILD" \
