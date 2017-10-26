@@ -33,10 +33,24 @@ objects:
     labels:
       app: ${APP_NAME}-persistent
       template: ${APP_NAME}-persistent-template
-    name: ${APP_NAME}
+    name: jenkins-data
   spec:
     accessModes:
     - ReadWriteOnce
+    resources:
+      requests:
+        storage: 512Mi
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+    labels:
+      app: ${APP_NAME}-persistent
+      template: ${APP_NAME}-persistent-template
+    name: pod-log-store
+  spec:
+    accessModes:
+    - ReadWriteMany
     resources:
       requests:
         storage: 512Mi

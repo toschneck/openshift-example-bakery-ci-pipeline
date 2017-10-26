@@ -27,6 +27,9 @@ parameters:
     from: '[a-zA-Z0-9]{8}'
     generate: expression
     required: true
+  - name: NEXUS_HOST
+    description: "host of nexus repo"
+    required: true
 objects:
 - apiVersion: v1
   kind: BuildConfig

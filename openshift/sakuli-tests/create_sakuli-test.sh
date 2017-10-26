@@ -22,14 +22,20 @@ SOURCE_DOCKERFILE='Dockerfile_ubuntu'
 TEMPLATE_BUILD=$FOLDER/openshift.sakuli.image.build.yaml
 TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.template.yaml
 
+### check if script is triggered in a jenkins environment to copy logs after execution
+if [[ -z $BUILD_NUMBER ]]; then
+    echo "use normal pod template: $TEMPLATE_DEPLOY"
+else
+    echo "env 'BUILD_NUMBER' configured: $BUILD_NUMBER"
+    TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.jenkins.template.yaml
+    echo "use jenkins config $TEMPLATE_DEPLOY"
+    OC_EXTRA_PARAM="-p BUILD_NUMBER=$BUILD_NUMBER"
+    echo "OC_EXTRA_PARAM: '$OC_EXTRA_PARAM'"
+fi
+
 ### add additional arguments
 if [ -z $STAGE ]; then
     STAGE=dev
-fi
-if [ -z $NEXUS_HOST ]; then
-    # needed to set via environment vars
-    # NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
-    echo "no env 'NEXUS_HOST' defined" && exit 1
 fi
 if [ -z $IMAGE_NAME ]; then
     # determine the correct image_name for the k8s objects
@@ -44,7 +50,7 @@ if [ -z $BAKERY_REPORT_URL ]; then
     BAKERY_REPORT_URL="http://bakery-report-server/report/"
 fi
 
-echo "ENVS: STAGE=$STAGE, GIT_BRANCH=$GIT_BRANCH, NEXUS_HOST=$NEXUS_HOST, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE
+echo "ENVS: STAGE=$STAGE, GIT_BRANCH=$GIT_BRANCH, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE
       BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD,
       TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
 
@@ -57,10 +63,9 @@ function deployOpenshiftObject(){
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
         -p IMAGE_NAME=$IMAGE_NAME \
-        -p NEXUS_HOST=$NEXUS_HOST \
         -p E2E_TEST_NAME=$app_name \
         -p BAKERY_REPORT_URL=$BAKERY_REPORT_URL \
-        -p BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL \
+        -p BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL $OC_EXTRA_PARAM \
         | oc apply -f -
     
     $FOLDER/validate_pod-state.sh $app_name

@@ -16,7 +16,7 @@ CUR_DATE="$(date +%Y-%m-%d_%H-%M-%S)"
 ZIPNAME=$SUITE-$CUR_DATE.zip
 ART=${SUITE}-logs
 
-cd $FOLDER
+cd $FOLDER/../..
 zip -r $ZIPNAME ./$SUITE
 
 curl -v -F r=releases -F hasPom=false -F e=zip -F g=sakuli -F a=${ART} -F v=${CUR_DATE} -F p=zip \

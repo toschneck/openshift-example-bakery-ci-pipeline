@@ -56,13 +56,13 @@ stage('E2E Tests') {
         //build and start sakuli tests
         ocSakuliBuild('sakuli-test')
         parallel blueberry: {
-            ocSakuliDeploy('blueberry')
+            ocRunSakuliTest('blueberry')
         }, orderpdf: {
-            ocSakuliDeploy('order-pdf')
+            ocRunSakuliTest('order-pdf')
         }, chocolate: {
-            ocSakuliDeploy('chocolate')
+            ocRunSakuliTest('chocolate')
         }, caramel: {
-            ocSakuliDeploy('caramel')
+            ocRunSakuliTest('caramel')
         }
     }
 }
@@ -118,11 +118,29 @@ private void ocCitrusTests(String component) {
     }
 }
 
-private void ocSakuliDeploy(String component) {
+private void ocRunSakuliTest(String component) {
     stage("start ${component}") {
-        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_sakuli-test.sh ${component}"
+        def statusCode = sh script: "STAGE=${STAGENAME} openshift/sakuli-tests/create_sakuli-test.sh ${component}", returnStatus: true
+        printf("Sakuli finished with error code: $statusCode")
+
+        archiveSakuliLogs()
+
+        if (statusCode == 0) {
+            echo "Sakuli E2E test $component was sucessful!"
+        } else if (statusCode > 0 && statusCode < 6) {
+            printf("Sakuli has exceeded warning/critical times in test $component (build marked UNSTABLE)")
+            currentBuild.result = 'UNSTABLE'
+        } else {
+            error "Sakuli have found some errors in test $component!"
+        }
     }
 }
+
+private void archiveSakuliLogs() {
+    sh 'rm -rf ./archive/*; cp -r $POD_LOG_STORE/$BUILD_NUMBER/ ./archive/'
+    archiveArtifacts "archive/**/*"
+}
+
 
 private void selectStage(String stagename) {
     sh "oc project ta-pipeline-${stagename}"

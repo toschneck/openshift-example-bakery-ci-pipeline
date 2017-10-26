@@ -70,7 +70,9 @@ function buildOpenshiftObject(){
         -p UPDATED="$(date +%Y-%m-%d_%H:%M:%S)" \
         | oc apply -f -
     oc start-build "$app_name" --follow --wait
-    exit $?
+    excode=$?
+    echo "EXIT BUILD: $excode"
+    exit $excode
 }
 function buildDeleteOpenshiftObject(){
     app_name=$1

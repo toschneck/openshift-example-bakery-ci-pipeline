@@ -27,6 +27,9 @@ parameters:
   name: IMAGE_NAME
   required: true
   value: sakuli-test-image:latest
+- description: "number of jenkins build to store logs into mounted volume"
+  name: BUILD_NUMBER
+  required: true
 ### Configuration of OpenShift objects
 objects:
 ### POD config (run one time)
@@ -42,6 +45,11 @@ objects:
     restartPolicy: Never
     dnsPolicy: ClusterFirst
     terminationGracePeriodSeconds: 5
+    # should be created by jenkins  see openshift/jenkins/jenkins.persistent.yml
+    volumes:
+    - name: pod-log-store
+      persistentVolumeClaim:
+        claimName: pod-log-store
     containers:
     - name: ${E2E_TEST_NAME}
       image: ${IMAGE_NAME}
@@ -55,6 +63,10 @@ objects:
           value: '350'
         - name: TZ
           value: 'Europe/Berlin'
+        - name: E2E_TEST_NAME
+          value: "${E2E_TEST_NAME}"
+        - name: JOB_LOG_STORE
+          value: "/mnt/pod-logs/${BUILD_NUMBER}"
       args:
         ### make normal UI startup to connect via: oc rsh <pod-name> bash
 #        - --tail-log
@@ -63,6 +75,9 @@ objects:
         - /headless/sakuli/bakery/${E2E_TEST_NAME}
         # - -browser
         # - chrome
+        ### trigger upload of logs
+        - -postHook
+        - /headless/sakuli/bakery/_common/scripts/copy_logs_to_storage.sh
         ### set e.g. debug level
 #        - -D
 #        - log.level.sakuli=DEBUG
@@ -85,6 +100,9 @@ objects:
         limits:
           cpu: 750m
           memory: 2200Mi
+      volumeMounts:
+      - mountPath: "/mnt/pod-logs"
+        name: pod-log-store
 ### Service -> POD config
 - apiVersion: v1
   kind: Service
