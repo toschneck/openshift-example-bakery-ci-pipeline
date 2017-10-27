@@ -9,10 +9,6 @@ parameters:
     value: jenkins
   - name: HOSTNAME_HTTP
     description: 'Custom hostname for http service route.  Leave blank for default hostname, e.g.: <APP_NAME-name>-<project>.<default-domain-suffix>'
-  - name: POD_LOG_STORE
-    description: 'temporary storage for pod logs'
-    required: true
-    value: "/var/lib/jenkins/pod-log-store"
 objects:
 - apiVersion: v1
   kind: DeploymentConfig
@@ -53,8 +49,6 @@ objects:
             value: jenkins-jnlp
           - name: TZ
             value: 'Europe/Berlin'
-          - name: POD_LOG_STORE
-            value: "${POD_LOG_STORE}"
           serviceAccount: jenkins
           image: ''
           imagePullPolicy: Always
@@ -87,8 +81,6 @@ objects:
             privileged: false
           terminationMessagePath: /dev/termination-log
           volumeMounts:
-          - mountPath: "${POD_LOG_STORE}"
-            name: pod-log-store
           - mountPath: /var/lib/jenkins
             name: jenkins-data
         dnsPolicy: ClusterFirst
@@ -98,9 +90,6 @@ objects:
         serviceAccountName: jenkins
         terminationGracePeriodSeconds: 10
         volumes:
-        - name: pod-log-store
-          persistentVolumeClaim:
-            claimName: pod-log-store
         - name: jenkins-data
           persistentVolumeClaim:
             claimName: jenkins-data

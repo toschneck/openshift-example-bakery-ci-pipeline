@@ -29,7 +29,12 @@ else
     echo "env 'BUILD_NUMBER' configured: $BUILD_NUMBER"
     TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.jenkins.template.yaml
     echo "use jenkins config $TEMPLATE_DEPLOY"
-    OC_EXTRA_PARAM="-p BUILD_NUMBER=$BUILD_NUMBER"
+    if [ -z $NEXUS_HOST ]; then
+        # needed to set via environment vars
+        # NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
+        echo "no env 'NEXUS_HOST' defined" && exit 1
+    fi
+    OC_EXTRA_PARAM="-p NEXUS_HOST=$NEXUS_HOST"
     echo "OC_EXTRA_PARAM: '$OC_EXTRA_PARAM'"
 fi
 

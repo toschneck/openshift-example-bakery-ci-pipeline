@@ -123,8 +123,6 @@ private void ocRunSakuliTest(String component) {
         def statusCode = sh script: "STAGE=${STAGENAME} openshift/sakuli-tests/create_sakuli-test.sh ${component}", returnStatus: true
         printf("Sakuli finished with error code: $statusCode")
 
-        archiveSakuliLogs()
-
         if (statusCode == 0) {
             echo "Sakuli E2E test $component was sucessful!"
         } else if (statusCode > 0 && statusCode < 6) {
@@ -135,12 +133,6 @@ private void ocRunSakuliTest(String component) {
         }
     }
 }
-
-private void archiveSakuliLogs() {
-    sh 'rm -rf ./archive/*; cp -r $POD_LOG_STORE/$BUILD_NUMBER/ ./archive/'
-    archiveArtifacts "archive/**/*"
-}
-
 
 private void selectStage(String stagename) {
     sh "oc project ta-pipeline-${stagename}"
