@@ -53,7 +53,7 @@ function deleteOpenshiftObject(){
         -p STAGE=$STAGE \
         -p NEXUS_HOST=$NEXUS_HOST \
         | oc delete -f -
-    echo ".... wait" && sleep 3
+    echo ".... wait" && sleep 5
     oc delete pod -l jenkins=slave
 }
 
@@ -74,7 +74,7 @@ function deployToOpenshift() {
         deleteOpenshiftObject $app_name
     else
         createOpenshiftObject $app_name
-        echo "...." && sleep 3
+        echo "...." && sleep 5
         buildOpenshiftObject $app_name
     fi
     echo "-------------------------------------------------------------------"
