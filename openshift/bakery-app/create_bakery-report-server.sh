@@ -13,7 +13,7 @@ if [[ $1 =~ build ]]; then
     OS_BUILD_ONLY=true
 fi
 if [ -z  $NEXUS_HOST ]; then
-    NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
+    export NEXUS_HOST="nexus-ta-nexus.192.168.37.1.nip.io"
 fi
 if [ -z $GIT_BRANCH ]; then
     GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)

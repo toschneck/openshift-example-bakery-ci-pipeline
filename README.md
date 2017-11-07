@@ -72,18 +72,20 @@ First of all we need a working Nexus registry, where we can deploy our maven art
     oc new-project ta-nexus
     openshift/infrastructur/nexus/create-nexus.sh
         
-After the deployment is successful you will get a new Nexus. Please note the URL how you can access it. On my local OpenShift cluster it is: `nexus-ta-nexus.10.0.6.193.xip.io`
+After the deployment is successful you will get a new Nexus. Please note the URL how you can access it. On my local OpenShift cluster it is: `nexus-ta-nexus.192.168.37.1.nip.io`
 
     oc describe route nexus | grep -i request
-    Requested Host:		nexus-ta-nexus.10.0.6.193.xip.io
+    Requested Host:		nexus-ta-nexus.192.168.37.1.nip.io
  
 ### Define `NEXUS_HOST`
 
 Use the hostname of te nexus repository you wan't to use. In the example above it is `nexus-ta-nexus.10.0.100.201.xip.io`, so execute:
     
-    export NEXUS_HOST=nexus-ta-nexus.10.0.6.193.xip.io
+    export NEXUS_HOST=nexus-ta-nexus.192.168.37.1.nip.io
 
 **NOTE:** If you use your own Nexus you may have to update the credentials at [openshift/infrastructur/maven-cd-settings.xml](openshift/infrastructur/maven-cd-settings.xml). 
+
+**NOTE:** If you use an `oc cluster up` environment, ensure that you firewall enables inbound traffic on your interface `docker0` from the OpenShift IP range. In my example I had to add the following UFW rule: `sudo ufw allow in on docker0 from 192.168.199.1/24`
 
 ### Create and Start OpenShift Pipeline 
    

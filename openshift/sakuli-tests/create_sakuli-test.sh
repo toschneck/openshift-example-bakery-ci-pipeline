@@ -29,9 +29,9 @@ else
     echo "env 'BUILD_NUMBER' configured: $BUILD_NUMBER"
     TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.jenkins.template.yaml
     echo "use jenkins config $TEMPLATE_DEPLOY"
-    if [ -z $NEXUS_HOST ]; then
-        # needed to set via environment vars
-        # NEXUS_HOST="nexus-ta-nexus.127.0.0.1.nip.io"
+    if [ -z $NEXUS_HOST ] && [[ $OS_BUILD_ONLY == true ]]; then
+        # needed to set via environment vars, eg.
+        # export NEXUS_HOST="nexus-ta-nexus.192.168.37.1.nip.io"
         echo "no env 'NEXUS_HOST' defined" && exit 1
     fi
     OC_EXTRA_PARAM="-p NEXUS_HOST=$NEXUS_HOST"
