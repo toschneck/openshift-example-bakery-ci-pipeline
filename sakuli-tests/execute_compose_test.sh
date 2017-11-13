@@ -13,7 +13,7 @@ function checkDefaults(){
         export BROWSER='chrome'
     fi
     if [ -z $TESTSUITE_FOLDER ]; then
-        export TESTSUITE_FOLDER=/opt/sakuli-tests/$TESTSUITE
+        export TESTSUITE_FOLDER=/headless/sakuli/bakery/$TESTSUITE
     fi
     if [ -z $TEST_OS ]; then
         export TEST_OS='ubuntu'

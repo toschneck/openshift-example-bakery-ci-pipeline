@@ -4,15 +4,16 @@ var PDF_EDITOR_NAME = "masterpdfeditor4";
 
 function bakeryURL() {
     envUrl = getEnvVar('BAKERY_BAKERY_URL');
-    if (envUrl === "") {
+    if (!envUrl) {
         envUrl = "http://bakery-web-server:8080/bakery/";
     }
     Logger.logInfo("BAKERY_URL: " + envUrl);
     return envUrl;
 }
+
 function reportURL() {
     envUrl = getEnvVar('BAKERY_REPORT_URL');
-    if (envUrl === "") {
+    if (!envUrl) {
         envUrl = "http://bakery-report-server:8080/report/";
     }
     Logger.logInfo("REPORT_URL: " + envUrl);
@@ -91,5 +92,8 @@ function openPrintPreview() {
 }
 
 function getEnvVar(key) {
-    return Packages.java.lang.System.getenv(key);
+    var ret = Packages.java.lang.System.getenv(key);
+    if (ret == "" || ret == "null") {
+        return undefined;
+    }
 }
