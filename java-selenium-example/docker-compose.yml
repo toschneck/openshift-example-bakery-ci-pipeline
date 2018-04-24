@@ -1,0 +1,23 @@
+version: '2'
+# run with: docker-compose up --build --force-recreate
+
+services:
+  sakuli_se_test:
+    build: .
+    environment:
+    - TZ=Europe/Berlin
+    user: "1000"
+    volumes:
+    - .:/opt/maven
+    - data:/headless/.m2
+    network_mode: "bridge"
+    ports:
+    - 5911:5901
+    - 6911:6901
+    # to keep container running and login via `docker exec -it javaexample_sakuli_java_test_1 bash`
+#    command: "'--tail-log'"
+    command: mvn clean test -P docker -f /opt/maven/pom.xml
+
+volumes:
+  data:
+    driver: local
