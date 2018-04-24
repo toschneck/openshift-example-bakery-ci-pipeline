@@ -40,7 +40,7 @@ if [ -z $IMAGE_NAME ]; then
     # determine the correct image_name for the k8s objects
     # no longer needed since https://docs.openshift.com/container-platform/3.6/dev_guide/managing_images.html#referencing-images-in-image-streams
     # but currently not enabled on the ConSol cluster
-    IMAGE_NAME=$(oc get is -l application=$IMAGE_SELECTOR -o yaml | grep dockerImageRepository | awk '{print $2}')
+    IMAGE_NAME=$(oc get imagestreams -l application=$IMAGE_SELECTOR -o yaml | grep dockerImageRepository | awk '{print $2}')
 fi
 
 echo "ENVS: STAGE=$STAGE, GIT_BRANCH=$GIT_BRANCH, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE

@@ -21,6 +21,7 @@ parameters:
   name: HOSTNAME_HTTP
 - description: 'Sakuli End-2-End image (see `docker search sakuli`) or internal build docker image of openshift'
   name: IMAGE_NAME
+  required: true
   value: sakuli-java-test-image:latest
 ### Configuration of OpenShift objects
 objects:
