@@ -49,6 +49,10 @@ objects:
             value: jenkins-jnlp
           - name: TZ
             value: 'Europe/Berlin'
+          - name: OPENSHIFT_JENKINS_JVM_ARCH
+            value: "x86_64"
+          - name: _JAVA_OPTIONS
+            value: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
           serviceAccount: jenkins
           image: ''
           imagePullPolicy: Always

@@ -1,71 +1,49 @@
 //Jenkinsfile (Declarative Pipeline)
-skip = false
-// global var for routing nexus-repository through the script
-String gNEXUS_HOST = "not-defined"
 STAGENAME = "dev"
 
-stage('prepare build environment') {
-    //check ENV
-    node() {
-        if ("${NEXUS_HOST}" == '') {
-            errors "No Nexus Repository defined! check environment variable 'NEXUS_HOST'"
-        }
-        printf("-------------- Using NEXUS_HOST=${NEXUS_HOST}")
-    }
-}
-
-stage('build maven artifacts') {
-    //artifact builds
-    node('maven') {
-        try {
-            printf("-------------- Using NEXUS_HOST=${NEXUS_HOST}")
-            selectStage(STAGENAME)
-            checkout scm
-            if (!skip) {
-                sh "openshift/bakery-app/maven-build.sh ${NEXUS_HOST}"
-            } else {
-                printf("Skipped maven build!!!")
-            }
-        }
-        finally {
-            printf("Validate Unit-Test")
-//            junit 'bakery-app/**/*.xml'
-        }
-    }
-}
-
-stage('build docker images') {
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> build images?'
-//    }
-    node() {
-        checkout scm
-        selectStage(STAGENAME)
-        parallel web: {
-            ocBakeryBuild('bakery-web-server')
-        }, report: {
-            ocBakeryBuild('bakery-report-server')
-        }, worker: {
-            ocBakeryBuild('bakery-workers')
-        }
-    }
-}
-
-stage('Trigger QA') {
+stage('E2E Tests') {
     timeout(time: 2, unit: 'DAYS') {
-        input message: '==> trigger QA?'
+        input message: '==> start E2E tests?'
     }
     node('') {
-        ocstage(STAGENAME, "qa")
-        //trigger next build pipeline
-        sh "openshift/create-build-pipeline.sh qa"
+        selectStage(STAGENAME)
+
+        //build and start sakuli tests
+        ocSakuliBuild('sakuli-selenium-tests')
+        ocRunSakuliTest('sakuli-selenium-tests', 'selenium-all')
+
+//        parallel blueberry: {
+//            ocRunSakuliTest('blueberry')
+//        }, orderpdf: {
+//            ocRunSakuliTest('order-pdf')
+//        }, chocolate: {
+//            ocRunSakuliTest('chocolate')
+//        }, caramel: {
+//            ocRunSakuliTest('caramel')
+//        }
+    }
+}
+
+private void ocSakuliBuild(String component) {
+    stage("build ${component} image") {
+        sh "STAGE=${STAGENAME} openshift/${component}/create_sakuli-test.sh build"
     }
 }
 
 
-private void ocBakeryBuild(String component) {
-    stage("build ${component} image") {
-        sh "openshift/bakery-app/create_${component}.sh build"
+private void ocRunSakuliTest(String component, String testname) {
+    stage("start ${component}") {
+        def statusCode = sh script: "STAGE=${STAGENAME} openshift/${component}/create_sakuli-test.sh ${testname}", returnStatus: true
+        printf("Sakuli finished with error code: $statusCode")
+
+        if (statusCode == 0) {
+            echo "Sakuli E2E test $component was sucessful!"
+        } else if (statusCode > 0 && statusCode < 6) {
+            printf("Sakuli has exceeded warning/critical times in test $component (build marked UNSTABLE)")
+            currentBuild.result = 'UNSTABLE'
+        } else {
+            error "Sakuli have found some errors in test $component!"
+        }
     }
 }
 
@@ -73,8 +51,3 @@ private void selectStage(String stagename) {
     sh "oc project ta-pipeline-${stagename}"
 }
 
-private void ocstage(String src, String dest) {
-    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-report-server:latest"
-    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-web-server:latest"
-    sh "openshift/bakery-app/stage-images.sh ${src} ${dest} bakery-worker:latest"
-}
