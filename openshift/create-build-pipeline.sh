@@ -83,7 +83,7 @@ function deployToOpenshift() {
 }
 
 oc project ta-pipeline-dev
-deployToOpenshift "bakery-$STAGE-ci"
+deployToOpenshift "pipeline-$STAGE-ci"
 
 wait
 exit $?
