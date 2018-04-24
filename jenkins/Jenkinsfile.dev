@@ -1,17 +1,13 @@
 //Jenkinsfile (Declarative Pipeline)
 STAGENAME = "dev"
 
-stage('E2E Tests') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: '==> start E2E tests?'
-    }
+stage('BUILD E2E Tests') {
     node() {
         checkout scm
         selectStage(STAGENAME)
 
         //build and start sakuli tests
         ocSakuliBuild('sakuli-selenium-tests')
-        ocRunSakuliTest('sakuli-selenium-tests', 'selenium-all')
 
 //        parallel blueberry: {
 //            ocRunSakuliTest('blueberry')
@@ -22,6 +18,21 @@ stage('E2E Tests') {
 //        }, caramel: {
 //            ocRunSakuliTest('caramel')
 //        }
+    }
+}
+
+stage('RUN E2E Tests') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> start E2E tests?'
+    }
+    node() {
+        checkout scm
+        selectStage(STAGENAME)
+
+        //build and start sakuli tests
+        ocRunSakuliTest('sakuli-selenium-tests', 'selenium-all')
+
+
     }
 }
 
