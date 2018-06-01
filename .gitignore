@@ -18,3 +18,4 @@ logs
 *.log
 *.sakuli-steps-cache
 *.cache
+**/webdriver
