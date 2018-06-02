@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+#more infos: https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md
+
 if [ -z $OSENV ]; then
     OSENV="$HOME/apps/oc/data/ta-pipeline"
 fi
@@ -22,6 +25,7 @@ fi
 
 mkdir -p $OSENV/config
 mkdir -p $OSENV/data
+mkdir -p $OSENV/pv
 mkdir -p $OSENV/vol
 echo "using openshift data space 'OSENV': $OSENV"
 
@@ -30,11 +34,12 @@ sudo ip addr add $BASIC_IP/24 dev lo
 
 echo "create oc cluster for $OSENV"
 oc cluster up \
-	 --version='v3.6.0' \
+	 --version='v3.7.2' \
 	 --use-existing-config=true \
 	 --host-config-dir=$OSENV/config \
 	 --host-data-dir=$OSENV/data \
-	 --host-pv-dir=$OSENV/vol \
+	 --host-pv-dir=$OSENV/pv \
+	 --host-volumes-dir=$OSENV/vol \
 	 --public-hostname=$BASIC_IP
 
 # if persistence volumens can't write try:
