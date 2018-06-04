@@ -128,6 +128,7 @@ objects:
   metadata:
     labels:
       app: ${SERVICE_NAME}
+      router: public
     name: ${SERVICE_NAME}
   spec:
     port:

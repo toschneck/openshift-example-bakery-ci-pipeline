@@ -115,6 +115,7 @@ objects:
       description: Route for ${APP_NAME}
     labels:
       application: ${APP_NAME}
+      router: public
     name: ${APP_NAME}
   spec:
     host: ${HOSTNAME_HTTP}
