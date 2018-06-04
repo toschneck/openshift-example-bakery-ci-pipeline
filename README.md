@@ -2,6 +2,7 @@
 
 The GitHub repository [toschneck/openshift-example-bakery-ci-pipeline](https://github.com/toschneck/openshift-example-bakery-ci-pipeline) contains, the sourcecode for the examples of the talk **[Continuous Testing: Integration- und UI-Testing mit OpenShift-Build-Pipelines](https://www.slideshare.net/TobiasSchneck/continuous-testing-integration-und-uitesting-mit-openshiftbuildpipelines)** at the Redhat/ConSol OpenShift-Day:
 
+#TODO TS UPDATE
 [![Continuous Testing](.markdownpics/slide_first_page_1.png)](https://www.slideshare.net/TobiasSchneck/continuous-testing-integration-und-uitesting-mit-openshiftbuildpipelines)
 
 
@@ -42,10 +43,9 @@ First you have to login at your running openshift, like this:
 
     oc login -u developer -p developer --insecure-skip-tls-verify=true https://MYHOST:8443
     
-If you doesn't have an existing installation use [MiniShift](https://github.com/minishift/minishift) or create a local cluster with the command:
+If you doesn't have an existing installation use [MiniShift](https://github.com/minishift/minishift) or create a local cluster with the script - needs a installed [`oc-cluster-wrapper`](https://github.com/openshift-evangelists/oc-cluster-wrapper):
 
-    export OSENV=~/your-local-path
-    openshift/oc-cluster-up-with-vol-command.sh
+    openshift/cluster-setup/oc-cluster-up.sh
   
  
 ### Create Project Infrastructure and Jenkins Server

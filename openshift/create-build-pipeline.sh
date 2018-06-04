@@ -20,7 +20,7 @@ fi
 if [ -z  $NEXUS_HOST ]; then
     #local openshift
     #IMAGE_PREFIX='172.30.1.1:5000'
-    export NEXUS_HOST="nexus-ta-nexus.192.168.37.1.nip.io"
+    export NEXUS_HOST="nexus-ta-nexus.apps.192.168.37.1.nip.io"
     #consol nexus
     #NEXUS_HOST="nexus-ta-nexus.paasint.consol.de"
 fi

@@ -42,5 +42,7 @@ oc cluster up \
 	 --host-volumes-dir=$OSENV/vol \
 	 --public-hostname=$BASIC_IP
 
-# if persistence volumens can't write try:
-# echo "wait 10 sec" && sleep 10 && sudo chown $(id -u):$(id -g) -R $OSENV/vol
+#check status
+echo "wait 10 sec" && sleep 10 \
+    &&  oc login -u developer -p developer --insecure-skip-tls-verify=true $BASIC_IP \
+    && oc cluster status
