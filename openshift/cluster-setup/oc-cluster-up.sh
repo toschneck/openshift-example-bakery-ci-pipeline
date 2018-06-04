@@ -15,7 +15,7 @@ fi
 BASIC_IP=192.168.37.1
 
 function stop(){
-    oc-cluster down $OS_PROFILE
+    oc-cluster down
     sudo ip addr delete $BASIC_IP/24 dev lo
 }
 
@@ -40,19 +40,21 @@ export OC_CLUSTER_PUBLIC_HOSTNAME=$BASIC_IP
 oc-cluster up $OS_PROFILE \
 	 -e TZ=Europe/Berlin \
 	 --version='v3.7.2'
+oc-cluster plugin-install registryv2
 
 #check status
-echo "wait 10 sec" && sleep 10 \
-    &&  oc login -u developer -p developer --insecure-skip-tls-verify=true $BASIC_IP \
+echo "wait 5 sec" && sleep 5 \
+    && oc login -u developer -p developer --insecure-skip-tls-verify=true "https://$BASIC_IP:8443" \
     && oc cluster status
 
-
-##on errors:
+## on errors:
 #
-#--> on error `NodeUnderDiskPressure` edit `~/.oc/profiles/ta-pipeline/config/node-localhost/node-config.yaml`
+# if`NodeUnderDiskPressure` edit `~/.oc/profiles/ta-pipeline/config/node-localhost/node-config.yaml`
+#
 #kubeletArguments:
 #  eviction-hard:
 #  - memory.available<100Mi
 #  - nodefs.available<1%
 #  - nodefs.inodesFree<1%
 #  - imagefs.available<1%
+echo "------ done!"
