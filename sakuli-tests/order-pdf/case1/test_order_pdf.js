@@ -32,7 +32,6 @@ try {
     _dynamicInclude("../../_common/common.js");
     loadPicsForEnvironment(testCase);
     var $bakeryURL = bakeryURL();
-    var $sleep4Prasentation = sleep4Prasentation();
 
     _navigateTo($bakeryURL);
     visibleHighlight(_heading1("Cookie Bakery Application"));
@@ -44,7 +43,6 @@ try {
         .forEach(function ($identifier) {
             visibleHighlight($identifier);
         });
-    env.sleep($sleep4Prasentation);
     testCase.endOfStep("validate HTML view", 30);
 
     //open print preview
@@ -56,23 +54,20 @@ try {
         .right(140).highlight().click()
         .grow(0, 40)
         .find("landscape.png").click();
-    env.sleep($sleep4Prasentation);
     testCase.endOfStep("rotate to landscap", 30);
 
     //save as pdf
     screen.find("save_button").highlight().click();
-    env.sleep($sleep4Prasentation);
     env.type("a", Key.CTRL) //mark filename in "save under" dialog
-        .type(pdfFilePath + Key.ENTER) //type filename and press ENTER
-        .sleep($sleep4Prasentation);
+        .type(pdfFilePath + Key.ENTER); //type filename and press ENTER
 
     //open pdf and validate
     appPDF = openPdfFile(pdfFilePath);
-    env.sleep($sleep4Prasentation);
     var warn = screen.exists("masterpdf_update_warning", 5);
     if (warn){
         warn.highlight().click().type(Key.ESC);
     }
+    appPDF.focus();
     screen.waitForImage("pdf_order_header", 30).highlight();
     [
         "pdf_blueberry",
