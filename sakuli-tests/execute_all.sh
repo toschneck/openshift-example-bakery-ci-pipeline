@@ -6,7 +6,7 @@ FOLDER=$(pwd)
 export ADD_ARGUMENT=""
 
 ### excute the different services
-TESTSUITE='blueberry' BROWSER='firefox' SERVICENAME='sakuli_1' $FOLDER/execute_compose_test.sh $@ &
+TESTSUITE='blueberry' SERVICENAME='sakuli_1' $FOLDER/execute_compose_test.sh $@ &
 
 TESTSUITE='caramel' SERVICENAME='sakuli_2' $FOLDER/execute_compose_test.sh $@ &
 

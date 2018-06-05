@@ -20,10 +20,6 @@ function reportURL() {
     return reportUrl;
 }
 
-function sleep4Prasentation() {
-    return 1;
-}
-
 function loadPicsForEnvironment(testCase) {
     testCase.addImagePaths(COMMON_PATH);
 
@@ -36,19 +32,11 @@ function loadPicsForEnvironment(testCase) {
 }
 
 function getEnvPicFolder() {
-    if (_isChrome()) {
-        if (isUbuntu()) {
-            Logger.logInfo('Detected environment: Ubuntu + Chrome >> overload some image patterns');
-            return "ubuntu_chrome";
-        }
-        Logger.logInfo('Detected environment: CentOS + Chrome >> overload some image patterns');
-        return "centos_chrome"
-    }
-    if (isUbuntu()) {
+    if (_isFF()) {
         Logger.logInfo('Detected environment: Ubuntu + Firefox >> overload some image patterns');
-        return "ubuntu_firefox";
+        return "firefox";
     }
-    Logger.logInfo('Detected default environment: CentOS + Firefox >> no image patterns to overload');
+    Logger.logInfo('Detected default environment: Ubuntu + Chrome >> no image patterns to overload');
     return null;
 }
 
@@ -85,7 +73,7 @@ function cleanupReport($linkname) {
 function openPrintPreview() {
     new RegionRectangle(500, 500, 0, 0).mouseMove();
     if (_isFF()) {
-        env.type("f", Key.ALT).type("v");
+        env.type("f", Key.ALT).sleep(1).type("v");
     } else {
         env.type("p", Key.CTRL);
     }

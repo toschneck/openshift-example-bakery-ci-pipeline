@@ -18,7 +18,6 @@ fi
 
 ### DEFAULTS:
 IMAGE_SELECTOR='sakuli-test-image'
-SOURCE_DOCKERFILE='Dockerfile.ubuntu'
 TEMPLATE_BUILD=$FOLDER/openshift.sakuli.image.build.yaml
 TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.template.yaml
 
@@ -55,7 +54,7 @@ if [ -z $BAKERY_REPORT_URL ]; then
     BAKERY_REPORT_URL="http://bakery-report-server/report/"
 fi
 
-echo "ENVS: STAGE=$STAGE, GIT_BRANCH=$GIT_BRANCH, IMAGE_NAME=$IMAGE_NAME, SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE
+echo "ENVS: STAGE=$STAGE, GIT_BRANCH=$GIT_BRANCH, IMAGE_NAME=$IMAGE_NAME,
       BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_BUILD=$TEMPLATE_BUILD,
       TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
 
@@ -97,7 +96,6 @@ function buildOpenshiftObject(){
 
     oc process -f "$TEMPLATE_BUILD" \
         -p IMAGE=$IMAGE_SELECTOR \
-        -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
         -p SOURCE_REPOSITORY_REF=$GIT_BRANCH \
         | oc apply -f -
 #    oc start-build "$IMAGE_SELECTOR" --follow --wait
@@ -125,7 +123,6 @@ function buildDeleteOpenshiftObject(){
     echo "Trigger DELETE Build for $IMAGE_SELECTOR"
     oc process -f "$TEMPLATE_BUILD" \
         -p IMAGE=$IMAGE_SELECTOR \
-        -p SOURCE_DOCKERFILE=$SOURCE_DOCKERFILE \
         -p SOURCE_REPOSITORY_REF=$GIT_BRANCH \
         | oc delete -f -
     echo "-------------------------------------------------------------------"

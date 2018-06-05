@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ### start local:
-#  WORKSPACE=~/sakuli-example-bakery-testing TESTSUITE=order-pdf BROWSER=chrome ./execute_compose_test.sh
+#  WORKSPACE=~/sakuli-example-bakery-testing TESTSUITE=order-pdf ./execute_compose_test.sh
 
 function checkDefaults(){
     if [ -z $SERVICENAME ]; then
@@ -8,9 +8,6 @@ function checkDefaults(){
     fi
     if [ -z $TESTSUITE ]; then
         export TESTSUITE='blueberry'
-    fi
-    if [ -z $BROWSER ]; then
-        export BROWSER='chrome'
     fi
     if [ -z $TESTSUITE_FOLDER ]; then
         export TESTSUITE_FOLDER=/headless/sakuli/bakery/$TESTSUITE

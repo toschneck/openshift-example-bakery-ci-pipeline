@@ -115,6 +115,7 @@ objects:
       description: Route for vnc's http service.
     labels:
       application: ${E2E_TEST_NAME}
+      router: public
     name: ${E2E_TEST_NAME}
   spec:
     host: ${HOSTNAME_HTTP}

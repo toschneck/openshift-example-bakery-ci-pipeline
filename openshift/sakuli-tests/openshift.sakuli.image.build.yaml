@@ -28,7 +28,7 @@ parameters:
   value: "sakuli-tests"
 - description: Name of the Dockerfile for example Dockerfile.sakuli.ubuntu.xfce
   name: SOURCE_DOCKERFILE
-  value: "Dockerfile.ubuntu"
+  value: "Dockerfile"
 - description: GitHub trigger secret
   from: '[a-zA-Z0-9]{8}'
   generate: expression

@@ -9,11 +9,10 @@ services:
       # for custom sakuli test client
       build:
         context: .
-        dockerfile: Dockerfile.$TEST_OS
       cpu_quota: 75000
       mem_reservation: 600MB
       mem_limit: 2000MB
-      command: run $TESTSUITE_FOLDER -browser $BROWSER $ADD_ARGUMENT
+      command: run $TESTSUITE_FOLDER $ADD_ARGUMENT
       # keeps container up, to connect with `docker exec -it sakuli-test... bash`
 #      command: --tail-log
       # NOT supported in Docker-in-Docker
