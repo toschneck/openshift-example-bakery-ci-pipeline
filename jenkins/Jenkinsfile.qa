@@ -25,7 +25,6 @@ stage('deploy QA system') {
         }, workers: {
             ocBakeryDeploy('bakery-workers')
         }
-        ocWaitServerBuild('wait-server')
     }
 }
 
@@ -37,7 +36,7 @@ stage('Integration Tests') {
         selectStage(STAGENAME)
 
         stage('deploy wait-server') {
-            sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_wait-server.sh"
+            sh "STAGE=${STAGENAME} openshift/helper/create_wait-server.sh"
         }
 
         stage('deploy citrus tests') {
@@ -97,12 +96,6 @@ private void ocBakeryDeploy(String component) {
 }
 
 private void ocSakuliBuild(String component) {
-    stage("build ${component} image") {
-        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_${component}.sh build"
-    }
-}
-
-private void ocWaitServerBuild(String component) {
     stage("build ${component} image") {
         sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_${component}.sh build"
     }
