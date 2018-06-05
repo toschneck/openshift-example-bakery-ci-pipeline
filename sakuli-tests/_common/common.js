@@ -3,21 +3,21 @@ var COMMON_PATH = "../../_common";
 var PDF_EDITOR_NAME = "masterpdfeditor4";
 
 function bakeryURL() {
-    envUrl = getEnvVar('BAKERY_BAKERY_URL');
-    if (!envUrl) {
-        envUrl = "http://bakery-web-server:8080/bakery/";
+    var bakeryUrl = env.getEnv('BAKERY_BAKERY_URL');
+    if (!bakeryUrl) {
+        bakeryUrl = "http://bakery-web-server:8080/bakery/";
     }
-    Logger.logInfo("BAKERY_URL: " + envUrl);
-    return envUrl;
+    Logger.logInfo("BAKERY_URL: " + bakeryUrl);
+    return bakeryUrl;
 }
 
 function reportURL() {
-    envUrl = getEnvVar('BAKERY_REPORT_URL');
-    if (!envUrl) {
-        envUrl = "http://bakery-report-server:8080/report/";
+    var reportUrl = env.getEnv('BAKERY_REPORT_URL');
+    if (!reportUrl) {
+        reportUrl = "http://bakery-report-server:8080/report/";
     }
-    Logger.logInfo("REPORT_URL: " + envUrl);
-    return envUrl;
+    Logger.logInfo("REPORT_URL: " + reportUrl);
+    return reportUrl;
 }
 
 function sleep4Prasentation() {
@@ -27,7 +27,7 @@ function sleep4Prasentation() {
 function loadPicsForEnvironment(testCase) {
     testCase.addImagePaths(COMMON_PATH);
 
-    //over load common environmen (centos firefox) if needed
+    //over load common environment (centos firefox) if needed
     var envPicFolder = getEnvPicFolder();
     if (envPicFolder != null) {
         testCase.addImagePaths(COMMON_PATH + "/" + envPicFolder);
@@ -88,12 +88,5 @@ function openPrintPreview() {
         env.type("f", Key.ALT).type("v");
     } else {
         env.type("p", Key.CTRL);
-    }
-}
-
-function getEnvVar(key) {
-    var ret = Packages.java.lang.System.getenv(key);
-    if (ret == "" || ret == "null") {
-        return undefined;
     }
 }

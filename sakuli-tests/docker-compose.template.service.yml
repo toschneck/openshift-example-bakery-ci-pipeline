@@ -9,7 +9,7 @@ services:
       # for custom sakuli test client
       build:
         context: .
-        dockerfile: Dockerfile_$TEST_OS
+        dockerfile: Dockerfile.$TEST_OS
       cpu_quota: 75000
       mem_reservation: 600MB
       mem_limit: 2000MB
