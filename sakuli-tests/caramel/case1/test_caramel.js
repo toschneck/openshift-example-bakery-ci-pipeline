@@ -29,7 +29,6 @@ try {
     loadPicsForEnvironment(testCase);
     var $bakeryURL = bakeryURL();
     var $reportURL = reportURL();
-    var $sleep4Prasentation = sleep4Prasentation();
 
     cleanupReport("Reset caramel");
     testCase.endOfStep("clean report server", 20);
@@ -49,7 +48,6 @@ try {
 
     //open print preview and validate it
     validatePrintPreview();
-    env.sleep($sleep4Prasentation);
     testCase.endOfStep("validate print preview", 45);
 
 
@@ -77,11 +75,9 @@ function adjustAmount() {
 function placeCaramelOrder() {
     clickHighlight(_label("caramel"));
     for (i = 0; i < $countOfClicks; i++) {
-        env.sleep($sleep4Prasentation);
         clickHighlight(_submit("Place order"));
     }
 
-    env.sleep($sleep4Prasentation);
     var $submittedSpans = _collect("_span", /Submitted 'caramel' order.*/);
 
     _assertEqual($countOfClicks, $submittedSpans.length);
@@ -94,7 +90,7 @@ function placeCaramelOrder() {
 
 function validateHtmlReportView() {
     _highlight(_heading1("Cookie Bakery Reporting"));
-    env.sleep(3);
+    env.sleep(1);
     clickHighlight(_link("Reload"));
     _highlight(_span("caramel"));
 
@@ -105,7 +101,6 @@ function validateHtmlReportView() {
     _assertEqual($countOfClicks * 30, Number($caramelValue), "Number of caramel orders does not fit!");
     //also do screen varification
     screen.find("pic_caramel.png").grow(50).highlight().find("web_caramel_120.png").highlight();
-    env.sleep($sleep4Prasentation);
 }
 
 
