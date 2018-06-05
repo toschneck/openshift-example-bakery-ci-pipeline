@@ -60,7 +60,7 @@ function deleteOpenshiftObject(){
 function buildOpenshiftObject(){
     app_name=$1
     echo "Trigger Build for $app_name"
-    oc start-build $app_name --follow --wait
+    oc start-build $app_name
     oc get builds -l application=$app_name
 }
 
