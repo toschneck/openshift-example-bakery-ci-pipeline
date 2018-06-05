@@ -68,7 +68,7 @@ objects:
               sh "openshift/bakery-app/create_bakery-workers.sh delete"
             }
             stage ('delete ui-tests') {
-              sh "openshift/sakuli-tests/create_wait-server.sh delete"
+              sh "openshift/helper/create_wait-server.sh delete"
               sh "openshift/sakuli-tests/create_sakuli-test.sh delete blueberry"
               sh "openshift/sakuli-tests/create_sakuli-test.sh delete caramel"
               sh "openshift/sakuli-tests/create_sakuli-test.sh delete chocolate"

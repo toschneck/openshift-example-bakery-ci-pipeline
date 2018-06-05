@@ -18,7 +18,7 @@ fi
 
 ### DEFAULTS:
 IMAGE_SELECTOR='sakuli-test-image'
-SOURCE_DOCKERFILE='Dockerfile_ubuntu'
+SOURCE_DOCKERFILE='Dockerfile.ubuntu'
 TEMPLATE_BUILD=$FOLDER/openshift.sakuli.image.build.yaml
 TEMPLATE_DEPLOY=$FOLDER/openshift.sakuli.pod.run.template.yaml
 
@@ -73,7 +73,7 @@ function deployOpenshiftObject(){
         -p BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL $OC_EXTRA_PARAM \
         | oc apply -f -
     
-    $FOLDER/validate_pod-state.sh $app_name
+    $FOLDER/../helper/validate_pod-state.sh $app_name
     exitcode=$?
     echo "-------------------------------------------------------------------"
     exit $exitcode

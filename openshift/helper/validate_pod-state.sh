@@ -12,11 +12,11 @@ SER_NAME=$1
 
 function validate() {
     state=""
-    while  [[ $state != "Terminated" ]] && [ $count -lt $maxval ]; do
+    while [[ $state != "Succeeded" ]] && [[ $state != "Failed" ]] && [ $count -lt $maxval ]; do
         echo "--------------------- Validate $count ---------------------------------------"
         echo ".... retry in $sleeper sec" && sleep $sleeper
-        state=$(oc describe pod $SER_NAME --show-events=false | grep 'State:' |  awk '{print $2}')
-        echo "$SER_NAME state=$state"
+        state=$(oc describe pod $SER_NAME --show-events=false | grep 'Status:' |  awk '{print $2}')
+        echo "$SER_NAME status=$state"
         ((count++))
     done;
     echo "-------------------------------------------------------------------"

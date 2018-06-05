@@ -1,8 +1,18 @@
 #docker-compose file for the both wait container, to get a trigger, when the webservers are reachable
+version: '2'
 
-wait:
-    container_name: wait-for-bakery-servers
-    build: wait-for-server
-    external_links:
-    - bakery-web-server
-    - bakery-report-server
+networks:
+  default:
+    external:
+      name: appdeploymentdockercompose_sakuli_network
+
+services:
+  wait-for-bakery:
+      container_name: wait-for-bakery-server
+      image: toschneck/wait-for-it
+      command: bakery-web-server:8080
+
+  wait-for-report:
+      container_name: wait-for-report-server
+      image: toschneck/wait-for-it
+      command: bakery-report-server:8080

@@ -3,11 +3,10 @@ cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 
 $FOLDER/create_sakuli-test.sh build &
-$FOLDER/create_wait-server.sh build &
+### test if app is up
+$FOLDER/create_wait-server.sh &
 wait
 
-### test if app is up
-$FOLDER/create_wait-server.sh
 ### excute the different services
 # Example Sakuli Testsuite
 $FOLDER/create_sakuli-test.sh 'blueberry' &

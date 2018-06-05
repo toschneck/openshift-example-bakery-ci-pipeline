@@ -3,32 +3,40 @@ cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 
 echo "ARGS: $1"
-if [[ $1 = delete-all ]]; then
-    OS_DELETE_ALL=true
-fi
 if [[ $1 =~ delete ]]; then
     OS_DELETE_DEPLOYMENT=true
 fi
-if [[ $1 =~ build ]]; then
-    OS_BUILD_ONLY=true
+
+### DEFAULTS:
+SER_NAME='wait-server'
+TEMPLATE_DEPLOY=$FOLDER/openshift.wait.pod.run.template.yaml
+if [ -z $BAKERY_BAKERY_URL ]; then
+    BAKERY_BAKERY_URL="http://bakery-web-server/bakery/"
+fi
+if [ -z $BAKERY_REPORT_URL ]; then
+    BAKERY_REPORT_URL="http://bakery-report-server/report/"
 fi
 
-TEMPLATE_DEPLOY=$FOLDER/citrus-test.yml
+echo "ENVS: BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL, BAKERY_REPORT_URL=$BAKERY_REPORT_URL, TEMPLATE_DEPLOY=$TEMPLATE_DEPLOY";
+
 count=0
+
 
 function deployOpenshiftObject(){
     app_name=$1
     echo "CREATE DEPLOYMENT for $app_name"
-    oc delete pods -l "application=$app_name"  --grace-period=0
+    oc delete pods -l "application=$app_name" --now --force
     echo ".... " && sleep 2
     oc process -f "$TEMPLATE_DEPLOY" \
-        -p CITRUS_TEST_NAME=$app_name \
+        -p APP_NAME=$app_name \
+        -p BAKERY_REPORT_URL=$BAKERY_REPORT_URL \
+        -p BAKERY_BAKERY_URL=$BAKERY_BAKERY_URL \
         | oc apply -f -
-
+    
     $FOLDER/../helper/validate_pod-state.sh $app_name
-    exitcode=$?
+
     echo "-------------------------------------------------------------------"
-    exit $exitcode
+
 }
 
 function deleteOpenshiftObject(){
@@ -43,7 +51,6 @@ function deleteOpenshiftObject(){
 
 }
 
-
 function triggerOpenshift() {
     echo "--------------------- APP $count ---------------------------------------"
     if [[ $OS_DELETE_DEPLOYMENT == "true" ]]; then
@@ -55,7 +62,6 @@ function triggerOpenshift() {
     ((count++))
 
 }
-SER_NAME=citrus-test
 triggerOpenshift
 
 wait

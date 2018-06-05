@@ -25,7 +25,6 @@ fi
 mvn -f $WORKSPACE/bakery-app/pom.xml -P docker-maven package \
     && docker-compose -f $COMPOSEFILE build \
     && docker-compose -f $COMPOSEFILE up -d \
-    && docker-compose -f $COMPOSE_WAIT build \
     && docker-compose -f $COMPOSE_WAIT up \
     && exit 0
 
