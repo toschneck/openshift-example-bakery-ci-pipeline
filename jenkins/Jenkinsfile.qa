@@ -14,28 +14,24 @@ stage('prepare build environment') {
 
 stage('deploy QA system') {
     node('') {
-        //TODO TS revert
-//
-//        selectStage(STAGENAME)
-//        checkout scm
-//        parallel activemq: {
-//            ocBakeryDeploy("activemq")
-//        }, web: {
-//            ocBakeryDeploy('bakery-web-server')
-//        }, report: {
-//            ocBakeryDeploy('bakery-report-server')
-//        }, workers: {
-//            ocBakeryDeploy('bakery-workers')
-//        }
+        selectStage(STAGENAME)
+        checkout scm
+        parallel activemq: {
+            ocBakeryDeploy("activemq")
+        }, web: {
+            ocBakeryDeploy('bakery-web-server')
+        }, report: {
+            ocBakeryDeploy('bakery-report-server')
+        }, workers: {
+            ocBakeryDeploy('bakery-workers')
+        }
     }
 }
 
-stage('Integration Tests') {
-    //TODO TS revert
-
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> start Integration tests?'
-//    }
+stage('citrus integration tests') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> start citrus integration tests?'
+    }
     node('') {
         selectStage(STAGENAME)
 
@@ -54,17 +50,16 @@ stage('Integration Tests') {
         }
 
         //use default maven node (old-solution)
-        stage('run citrus tests') {
-            ocCitrusTests("citrus-tests")
-        }
+        //stage('run citrus tests') {
+        //    ocCitrusTests("citrus-tests")
+        //}
     }
 }
 
-stage('E2E Tests') {
-    //TODO TS revert
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> start E2E tests?'
-//    }
+stage('sakuli E2E tests') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> start sakuli E2E tests?'
+    }
     node('') {
         selectStage(STAGENAME)
 
@@ -81,24 +76,25 @@ stage('E2E Tests') {
         }
     }
 }
-//TODO TS revert
+stage('Trigger PROD') {
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> deploy PROD system?'
+    }
+    node('') {
+        ocstage(STAGENAME, "prod")
 
-//stage('Trigger PROD') {
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> deploy PROD system?'
-//    }
-//    node('') {
-//        ocstage(STAGENAME, "prod")
-//
-//        //use dev jenkins
-//        selectStage("dev")
-//        //delete qa staqe
-//        sh "openshift/delete-deployment-pipeline.sh qa"
-//        //trigger next build pipeline
-//        sh "openshift/create-build-pipeline.sh prod"
-//    }
-//}
+        //use dev jenkins
+        selectStage("dev")
+        //delete qa staqe
+        sh "openshift/delete-deployment-pipeline.sh qa"
+        //trigger next build pipeline
+        sh "openshift/create-build-pipeline.sh prod"
+    }
+}
 
+private void selectStage(String stagename) {
+    sh "oc project ta-pipeline-${stagename}"
+}
 
 private void ocBakeryDeploy(String component) {
     stage("deploy ${component}") {
@@ -109,20 +105,6 @@ private void ocBakeryDeploy(String component) {
             printf("only housekeeping, do nonting: %s", e.toString())
         }
         sh "openshift/bakery-app/create_${component}.sh"
-    }
-}
-
-private void ocSakuliBuild(String component) {
-    stage("build ${component} image") {
-        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_${component}.sh build"
-    }
-}
-
-private void ocCitrusTests(String component) {
-    node('maven') {
-        sh "echo execute oc citrus build"
-        checkout scm
-        sh "citrus-tests/maven-build.sh ${NEXUS_HOST}"
     }
 }
 
@@ -146,6 +128,20 @@ private void ocCitrusJenkinsSlave(nodeAction) {
             }
 }
 
+private void ocCitrusTests(String component) {
+    node('maven') {
+        sh "echo execute oc citrus build"
+        checkout scm
+        sh "citrus-tests/maven-build.sh ${NEXUS_HOST}"
+    }
+}
+
+private void ocSakuliBuild(String component) {
+    stage("build ${component} image") {
+        sh "STAGE=${STAGENAME} openshift/sakuli-tests/create_${component}.sh build"
+    }
+}
+
 private void ocRunSakuliTest(String component) {
     stage("start ${component}") {
         def statusCode = sh script: "STAGE=${STAGENAME} openshift/sakuli-tests/create_sakuli-test.sh ${component}", returnStatus: true
@@ -160,10 +156,6 @@ private void ocRunSakuliTest(String component) {
             error "Sakuli have found some errors in test $component!"
         }
     }
-}
-
-private void selectStage(String stagename) {
-    sh "oc project ta-pipeline-${stagename}"
 }
 
 private void ocstage(String src, String dest) {

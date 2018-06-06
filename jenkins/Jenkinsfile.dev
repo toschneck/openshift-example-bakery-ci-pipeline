@@ -1,7 +1,5 @@
 //Jenkinsfile (Declarative Pipeline)
 skip = false
-// global var for routing nexus-repository through the script
-String gNEXUS_HOST = "not-defined"
 STAGENAME = "dev"
 
 stage('prepare build environment') {
@@ -29,15 +27,15 @@ stage('build maven artifacts') {
         }
         finally {
             printf("Validate Unit-Test")
-//            junit 'bakery-app/**/*.xml'
+            junit 'bakery-app/**/*report/*.xml'
         }
     }
 }
 
 stage('build docker images') {
-//    timeout(time: 2, unit: 'DAYS') {
-//        input message: '==> build images?'
-//    }
+    timeout(time: 2, unit: 'DAYS') {
+        input message: '==> build images?'
+    }
     node() {
         checkout scm
         selectStage(STAGENAME)
