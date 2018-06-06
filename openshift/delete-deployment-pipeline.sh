@@ -2,7 +2,7 @@
 cd $(dirname $(realpath $0))
 FOLDER=$(pwd)
 
-echo "ARGS: $1"
+echo "ARGS: $*"
 if [[ $1 =~ delete ]]; then
     OS_DELETE_ONLY=true
 fi
@@ -14,7 +14,7 @@ TEMPLATE=$FOLDER/delete.deployment.pipeline.yml
 count=0
 
 STAGE=$1
-if [[ $OS_DELETE_DEPLOYMENT == "true" ]] || [[ OS_BUILD_ONLY == "true" ]] ; then
+if [[ $OS_DELETE_ONLY == "true" ]] || [[ OS_BUILD_ONLY == "true" ]] ; then
     STAGE=$2
 fi
 if [[ $STAGE == "" ]]; then
@@ -47,7 +47,7 @@ function deleteOpenshiftObject(){
 function buildOpenshiftObject(){
     app_name=$1
     echo "Trigger Build for $app_name"
-    oc start-build $app_name --follow --wait
+    oc start-build $app_name
     oc get builds -l application=$app_name
 }
 

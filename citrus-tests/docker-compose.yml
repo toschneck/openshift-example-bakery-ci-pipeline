@@ -1,0 +1,20 @@
+### COMMON docker-compose-service-definition
+
+version: '2'
+
+services:
+  sakuli_basic:
+      container_name: sakuli-test-$TESTSUITE
+      #image: consol/sakuli-ubuntu-xfce:v1.1.0-beta
+      # for custom sakuli test client
+      build:
+        context: .
+      cpu_quota: 75000
+      mem_reservation: 600MB
+      mem_limit: 2000MB
+      command: run $TESTSUITE_FOLDER $ADD_ARGUMENT
+      # keeps container up, to connect with `docker exec -it sakuli-test... bash`
+#      command: --tail-log
+      # NOT supported in Docker-in-Docker
+#      volumes:
+#      - .:/opt/sakuli-tests

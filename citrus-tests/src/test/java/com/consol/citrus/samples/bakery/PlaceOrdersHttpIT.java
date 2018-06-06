@@ -17,8 +17,6 @@
 package com.consol.citrus.samples.bakery;
 
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.container.IteratingConditionExpression;
-import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.functions.Functions;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.http.client.HttpClient;
@@ -54,23 +52,18 @@ public class PlaceOrdersHttpIT extends TestNGCitrusTestDesigner {
                 .payload("{ \"order\": { \"type\": \"chocolate\", \"id\": ${orderId}, \"amount\": 1}}");
 
         repeatOnError()
-            .until(new IteratingConditionExpression() {
-                @Override
-                public boolean evaluate(int index, TestContext context) {
-                    return index > 20;
-                }
-            })
-            .autoSleep(1000L)
-            .actions(http().client(reportingClient)
-                            .send()
-                            .get("/reporting/order")
-                            .queryParam("id", "${orderId}"),
-                    http().client(reportingClient)
-                            .receive()
-                            .response(HttpStatus.OK)
-                            .messageType(MessageType.JSON)
-                            .payload("true")
-            );
+                .until((i, testContext) -> i > 20)
+                .autoSleep(1000L)
+                .actions(http().client(reportingClient)
+                                .send()
+                                .get("/reporting/order")
+                                .queryParam("id", "${orderId}"),
+                        http().client(reportingClient)
+                                .receive()
+                                .response(HttpStatus.OK)
+                                .messageType(MessageType.JSON)
+                                .payload("true")
+                );
 
         http().client(bakeryClient)
                 .receive()
@@ -89,23 +82,18 @@ public class PlaceOrdersHttpIT extends TestNGCitrusTestDesigner {
                 .payload("{ \"order\": { \"type\": \"caramel\", \"id\": ${orderId}, \"amount\": 1}}");
 
         repeatOnError()
-            .until(new IteratingConditionExpression() {
-                @Override
-                public boolean evaluate(int index, TestContext context) {
-                    return index > 20;
-                }
-            })
-            .autoSleep(1000L)
-            .actions(http().client(reportingClient)
-                            .send()
-                            .get("/reporting/order")
-                            .queryParam("id", "${orderId}"),
-                    http().client(reportingClient)
-                            .receive()
-                            .response(HttpStatus.OK)
-                            .messageType(MessageType.JSON)
-                            .payload("true")
-            );
+                .until((i, testContext) -> i > 20)
+                .autoSleep(1000L)
+                .actions(http().client(reportingClient)
+                                .send()
+                                .get("/reporting/order")
+                                .queryParam("id", "${orderId}"),
+                        http().client(reportingClient)
+                                .receive()
+                                .response(HttpStatus.OK)
+                                .messageType(MessageType.JSON)
+                                .payload("true")
+                );
 
         http().client(bakeryClient)
                 .receive()
@@ -124,23 +112,18 @@ public class PlaceOrdersHttpIT extends TestNGCitrusTestDesigner {
                 .payload("{ \"order\": { \"type\": \"blueberry\", \"id\": ${orderId}, \"amount\": 1}}");
 
         repeatOnError()
-            .until(new IteratingConditionExpression() {
-                @Override
-                public boolean evaluate(int index, TestContext context) {
-                    return index > 20;
-                }
-            })
-            .autoSleep(1000L)
-            .actions(http().client(reportingClient)
-                            .send()
-                            .get("/reporting/order")
-                            .queryParam("id", "${orderId}"),
-                    http().client(reportingClient)
-                            .receive()
-                            .response(HttpStatus.OK)
-                            .messageType(MessageType.JSON)
-                            .payload("true")
-            );
+                .until((i, context) -> i > 20)
+                .autoSleep(1000L)
+                .actions(http().client(reportingClient)
+                                .send()
+                                .get("/reporting/order")
+                                .queryParam("id", "${orderId}"),
+                        http().client(reportingClient)
+                                .receive()
+                                .response(HttpStatus.OK)
+                                .messageType(MessageType.JSON)
+                                .payload("true")
+                );
 
         http().client(bakeryClient)
                 .receive()

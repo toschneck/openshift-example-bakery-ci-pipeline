@@ -14,7 +14,6 @@
         <module>worker</module>
         <module>report</module>
         <module>app-deployment-maven</module>
-        <module>sakuli-tests-maven</module>
     </modules>
 
     <properties>
@@ -227,8 +226,8 @@
                     <version>3.3</version>
                     <configuration>
                         <encoding>${project.build.sourceEncoding}</encoding>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.8</source>
+                        <target>1.8</target>
                     </configuration>
                 </plugin>
                 <plugin>

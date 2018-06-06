@@ -14,24 +14,28 @@ stage('prepare build environment') {
 
 stage('deploy QA system') {
     node('') {
-        selectStage(STAGENAME)
-        checkout scm
-        parallel activemq: {
-            ocBakeryDeploy("activemq")
-        }, web: {
-            ocBakeryDeploy('bakery-web-server')
-        }, report: {
-            ocBakeryDeploy('bakery-report-server')
-        }, workers: {
-            ocBakeryDeploy('bakery-workers')
-        }
+        //TODO TS revert
+//
+//        selectStage(STAGENAME)
+//        checkout scm
+//        parallel activemq: {
+//            ocBakeryDeploy("activemq")
+//        }, web: {
+//            ocBakeryDeploy('bakery-web-server')
+//        }, report: {
+//            ocBakeryDeploy('bakery-report-server')
+//        }, workers: {
+//            ocBakeryDeploy('bakery-workers')
+//        }
     }
 }
 
 stage('Integration Tests') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: '==> start Integration tests?'
-    }
+    //TODO TS revert
+
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> start Integration tests?'
+//    }
     node('') {
         selectStage(STAGENAME)
 
@@ -39,16 +43,28 @@ stage('Integration Tests') {
             sh "STAGE=${STAGENAME} openshift/helper/create_wait-server.sh"
         }
 
-        stage('deploy citrus tests') {
+        stage('run citrus tests'){
+            ocCitrusJenkinsSlave(node('citrus') {
+                sh "echo execute oc citrus build"
+                checkout scm
+                sh "citrus-tests/maven-build.sh ${NEXUS_HOST}"
+                junit 'citrus-tests/target/citrus-reports/**/*.xml'
+                archiveArtifacts "citrus-tests/target/citrus-*/**/*"
+            })
+        }
+
+        //use default maven node (old-solution)
+        stage('run citrus tests') {
             ocCitrusTests("citrus-tests")
         }
     }
 }
 
 stage('E2E Tests') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: '==> start E2E tests?'
-    }
+    //TODO TS revert
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> start E2E tests?'
+//    }
     node('') {
         selectStage(STAGENAME)
 
@@ -65,22 +81,23 @@ stage('E2E Tests') {
         }
     }
 }
+//TODO TS revert
 
-stage('Trigger PROD') {
-    timeout(time: 2, unit: 'DAYS') {
-        input message: '==> deploy PROD system?'
-    }
-    node('') {
-        ocstage(STAGENAME, "prod")
-
-        //use dev jenkins
-        selectStage("dev")
-        //delete qa staqe
-        sh "openshift/delete-deployment-pipeline.sh qa"
-        //trigger next build pipeline
-        sh "openshift/create-build-pipeline.sh prod"
-    }
-}
+//stage('Trigger PROD') {
+//    timeout(time: 2, unit: 'DAYS') {
+//        input message: '==> deploy PROD system?'
+//    }
+//    node('') {
+//        ocstage(STAGENAME, "prod")
+//
+//        //use dev jenkins
+//        selectStage("dev")
+//        //delete qa staqe
+//        sh "openshift/delete-deployment-pipeline.sh qa"
+//        //trigger next build pipeline
+//        sh "openshift/create-build-pipeline.sh prod"
+//    }
+//}
 
 
 private void ocBakeryDeploy(String component) {
@@ -106,9 +123,27 @@ private void ocCitrusTests(String component) {
         sh "echo execute oc citrus build"
         checkout scm
         sh "citrus-tests/maven-build.sh ${NEXUS_HOST}"
-//            sh "mvn -s openshift/infrastructur/maven-cd-settings.xml -f citrus-tests/pom.xml verify"
-//        sh "mvn -f citrus-tests/pom.xml verify"
     }
+}
+
+/**
+ * Custom wrapper for executing the commands in a citrus-slave-image:
+ * See: https://github.com/citrusframework/citrus-docker-images/pull/3
+ *
+ * @param nodeAction
+ */
+private void ocCitrusJenkinsSlave(nodeAction) {
+    podTemplate(label: "citrus",
+            cloud: "openshift",
+            inheritFrom: "maven",
+            containers: [
+                    containerTemplate(name: "jnlp",
+                            image: "toschneck/citrus-jenkins-slave",
+                    )
+            ])
+            {
+                nodeAction
+            }
 }
 
 private void ocRunSakuliTest(String component) {
