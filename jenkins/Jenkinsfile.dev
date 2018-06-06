@@ -26,8 +26,9 @@ stage('build maven artifacts') {
             }
         }
         finally {
-            printf("Validate Unit-Test")
-            junit 'bakery-app/**/*report/*.xml'
+            //no unit test implemented yet
+            //printf("Validate Unit-Test")
+            //junit 'bakery-app/**/*report/*.xml'
         }
     }
 }
