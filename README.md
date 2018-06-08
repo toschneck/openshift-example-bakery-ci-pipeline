@@ -1,14 +1,13 @@
 # Automated CI/CD Build Pipeline with Jenkis in OpenShift
 
-The GitHub repository [toschneck/openshift-example-bakery-ci-pipeline](https://github.com/toschneck/openshift-example-bakery-ci-pipeline) contains, the sourcecode for the examples of the talk **[Continuous Testing: Integration- und UI-Testing mit OpenShift-Build-Pipelines](https://www.slideshare.net/TobiasSchneck/continuous-testing-integration-und-uitesting-mit-openshiftbuildpipelines)** at the Redhat/ConSol OpenShift-Day:
+The GitHub repository [toschneck/openshift-example-bakery-ci-pipeline](https://github.com/toschneck/openshift-example-bakery-ci-pipeline) contains, the sourcecode for the examples of the talk **[OpenShift-Build-Pipelines: Build ► Test ► Run!](https://www.slideshare.net/TobiasSchneck/openshiftbuildpipelines-build-test-run)**:
 
-#TODO TS UPDATE
-[![Continuous Testing](.markdownpics/slide_first_page_1.png)](https://www.slideshare.net/TobiasSchneck/continuous-testing-integration-und-uitesting-mit-openshiftbuildpipelines)
+[![OpenShift Build Pipelines](.markdownpics/slide_first_page_1.png)](https://www.slideshare.net/TobiasSchneck/openshiftbuildpipelines-build-test-run)
 
 
 The example shows, how we can setup up total automated build pipeline with following components:
 
-* [OpenShift Build Pipelines](https://docs.openshift.com/container-platform/3.5/install_config/configuring_pipeline_execution.html) 
+* [OpenShift Build Pipelines](https://docs.openshift.com/container-platform/3.7/install_config/configuring_pipeline_execution.html) 
 * [Jenkinsfile](https://jenkins.io/doc/book/pipeline/jenkinsfile/)
 * [Docker](https://www.docker.com/)
 * [Maven](http://maven.apache.org/)
