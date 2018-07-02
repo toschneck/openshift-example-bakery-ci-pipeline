@@ -12,6 +12,9 @@ stage('deploy PROD system') {
         ocBakeryDeploy('bakery-report-server')
         ocBakeryDeploy('bakery-workers')
         ocBakeryDeploy("activemq")
+        stage('deploy wait-server') {
+            sh "STAGE=${STAGENAME} openshift/helper/create_wait-server.sh"
+        }
     }
 }
 
