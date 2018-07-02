@@ -17,4 +17,4 @@ RUN apt-get update && apt-get install -y zip curl libqt5svg5 libqt5printsupport5
 ENV SAKULI_TEST_SUITE=/headless/sakuli/bakery
 COPY . $SAKULI_TEST_SUITE
 RUN $INST_SCRIPTS/set_user_permission.sh $SAKULI_TEST_SUITE
-USER 1984
+USER 1000
