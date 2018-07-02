@@ -21,6 +21,8 @@ docker-compose -f $COMPOSE_WAIT rm -f || echo "delete stoped containers"
 if [[ $1 =~ kill ]]; then
     exit 0
 fi
+
+$WORKSPACE/bakery-app/create-docker-network.sh
 ### build an startup application and  start the wait container to block until the web-applications are reachable
 mvn -f $WORKSPACE/bakery-app/pom.xml -P docker-maven package \
     && docker-compose -f $COMPOSEFILE build \
