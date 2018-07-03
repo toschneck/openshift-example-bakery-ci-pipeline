@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ngrok
+  namespace: drone
+  labels:
+    app: ngrok
+#expose service to https://dashboard.ngrok.com/status
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ngrok
+  template:
+    metadata:
+      labels:
+        app: ngrok
+    spec:
+      containers:
+      - name: ngrok
+        imagePullPolicy: IfNotPresent
+        image: gcr.io/kuar-demo/ngrok
+        stdin: true
+        tty: true
+        args:
+          - "http"
+          - "--config=/root/ngrok.yml"
+          - "--subdomain=kubeci-tobi"
+          - "--region=eu"
+          - "drone:8080"
+        volumeMounts:
+          - mountPath: /root/
+            name: ngrok-secret
+      volumes:
+      - name: ngrok-secret
+        secret:
+          secretName: ngrok-token
+
+

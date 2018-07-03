@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drone
+  namespace: drone
+  labels:
+    app: drone-ci
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+  selector:
+    app: drone-ci
+---
+## create oauth see README
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drone
+  namespace: drone
+  labels:
+    app: drone-ci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drone-ci
+  template:
+    metadata:
+      labels:
+        app: drone-ci
+    spec:
+      serviceAccountName: "drone-sa"
+      containers:
+      - env:
+        - name: DRONE_ADMIN
+          value: "toschneck"
+        - name: DRONE_CRON_DISABLED
+          value: "true"
+        - name: DRONE_CRON_INTERVAL
+          value: 1m
+        - name: DRONE_DEBUG_COLOR
+          value: "false"
+        - name: DRONE_DEBUG_PRETTY
+          value: "false"
+        - name: DRONE_DEBUG
+          value: "true"
+          #TODO use secret
+        - name: DRONE_GITHUB_CLIENT_ID
+          value: "aabbb44d43ec9c2f355d"
+        - name: DRONE_GITHUB_CLIENT_SECRET
+          value: "407f2742ffd664a06c736e40a8bea6a926f7f01b"
+        - name: DRONE_KUBERNETES_NAMESPACE
+          value: drone
+        - name: DRONE_KUBERNETES
+          value: "true"
+        - name: DRONE_OPEN
+          value: "false"
+        - name: DRONE_REGISTRATION_CLOSED
+          value: "false"
+        - name: DRONE_RUNNER_CAPACITY
+          value: "5"
+        - name: DRONE_RUNNER_PLATFORM
+          value: "linux/amd64"
+        - name: DRONE_SERVER_HOST
+          value: "kubeci-tobi.eu.ngrok.io"
+        - name: DRONE_SERVER_PROTO
+          value: "https"
+        - name: DRONE_SESSION_SECRET
+          value: "secret"
+        image: metalmatze/drone:latest
+#        image: drone/drone:latest
+        imagePullPolicy: Always
+        name: drone
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
