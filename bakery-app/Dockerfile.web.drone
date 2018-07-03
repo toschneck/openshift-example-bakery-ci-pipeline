@@ -1,0 +1,8 @@
+FROM consol/tomcat-7.0:7.0.62-usermode
+
+ENV MAIL_PORT_2222_TCP_ADDR=127.0.0.1, MAIL_PORT_2222_TCP_PORT=2222 \
+    ACTIVEMQ_PORT_61616_TCP_ADDR=activemq, ACTIVEMQ_PORT_61616_TCP_PORT=61616
+
+COPY web/target/bakery.war /maven/
+
+#USE command from base image

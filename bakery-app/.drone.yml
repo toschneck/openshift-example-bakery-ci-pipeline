@@ -1,0 +1,38 @@
+branches: drone
+
+pipeline:
+  maven:
+    image: maven:3.5-alpine
+    commands:
+      - mvn clean package
+    volumes:
+      - ${HOME}/.m2:/root/.m2
+
+  docker-image-worker:
+#    group: docker-images
+    image: plugins/docker
+    repo: toschneck/bakery-worker-drone
+    tag: ${DRONE_REPO_BRANCH}
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile.worker.drone
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  docker-image-web:
+#    group: docker-images
+    image: plugins/docker
+    repo: toschneck/bakery-web-drone
+    tag: ${DRONE_REPO_BRANCH}
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile.web.drone
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  docker-image-report:
+#    group: docker-images
+    image: plugins/docker
+    repo: toschneck/bakery-report-drone
+    tag: ${DRONE_REPO_BRANCH}
+    secrets: [ docker_username, docker_password ]
+    dockerfile: Dockerfile.report.drone
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+

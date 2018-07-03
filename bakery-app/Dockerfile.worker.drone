@@ -1,0 +1,8 @@
+FROM jolokia/java-jolokia:7
+
+ENV FACTORY_TYPE=chocolate, FACTORY_COSTS=200, \
+    REPORT_PORT_8080_TCP_ADDR=bakery-report-server, REPORT_PORT_8080_TCP_PORT=80, \
+    ACTIVEMQ_PORT_61616_TCP_ADDR=activemq, ACTIVEMQ_PORT_61616_TCP_PORT=61616
+
+COPY worker/target/worker.jar /maven/bakery-worker.jar
+CMD java -jar /maven/bakery-worker.jar
