@@ -5,8 +5,8 @@ pipeline:
     image: maven:3.5-alpine
     commands:
       - mvn clean package -f bakery-app/pom.xml
-    volumes:
-      - ${HOME}/.m2:/root/.m2
+#    volumes:
+#      - ${HOME}/.m2:/root/.m2
 
   docker-image-worker:
 #    group: docker-images
@@ -15,8 +15,8 @@ pipeline:
     tag: ${DRONE_REPO_BRANCH}
     secrets: [ docker_username, docker_password ]
     dockerfile: bakery-app/Dockerfile.worker.drone
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
   docker-image-web:
 #    group: docker-images
     image: plugins/docker
@@ -24,8 +24,8 @@ pipeline:
     tag: ${DRONE_REPO_BRANCH}
     secrets: [ docker_username, docker_password ]
     dockerfile: bakery-app/Dockerfile.web.drone
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
   docker-image-report:
 #    group: docker-images
     image: plugins/docker
@@ -33,6 +33,6 @@ pipeline:
     tag: ${DRONE_REPO_BRANCH}
     secrets: [ docker_username, docker_password ]
     dockerfile: bakery-app/Dockerfile.report.drone
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
 
