@@ -39,14 +39,8 @@ stage('citrus integration tests') {
             sh "STAGE=${STAGENAME} openshift/helper/create_wait-server.sh"
         }
 
-        stage('run citrus tests'){
-            ocCitrusJenkinsSlave(node('citrus') {
-                sh "echo execute oc citrus build"
-                checkout scm
-                sh "citrus-tests/maven-build.sh ${NEXUS_HOST}"
-                junit 'citrus-tests/target/citrus-reports/**/*.xml'
-                archiveArtifacts "citrus-tests/target/citrus-*/**/*"
-            })
+        stage('run citrus tests') {
+            ocCitrusJenkinsSlave()
         }
 
         //use default maven node (old-solution)
@@ -112,9 +106,8 @@ private void ocBakeryDeploy(String component) {
  * Custom wrapper for executing the commands in a citrus-slave-image:
  * See: https://github.com/citrusframework/citrus-docker-images/pull/3
  *
- * @param nodeAction
  */
-private void ocCitrusJenkinsSlave(nodeAction) {
+private void ocCitrusJenkinsSlave() {
     podTemplate(label: "citrus",
             cloud: "openshift",
             inheritFrom: "maven",
@@ -124,7 +117,13 @@ private void ocCitrusJenkinsSlave(nodeAction) {
                     )
             ])
             {
-                nodeAction
+                node('citrus') {
+                    sh "echo execute oc citrus build"
+                    checkout scm
+                    sh "citrus-tests/maven-build.sh ${NEXUS_HOST}"
+                    junit 'citrus-tests/target/citrus-reports/**/*.xml'
+                    archiveArtifacts "citrus-tests/target/citrus-*/**/*"
+                }
             }
 }
 
