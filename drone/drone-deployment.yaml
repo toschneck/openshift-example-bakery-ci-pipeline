@@ -83,3 +83,11 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
+        volumeMounts:
+          - mountPath: /data/
+            name: drone-vol
+      volumes:
+        - name: drone-vol
+          persistentVolumeClaim:
+            claimName: drone-vol
+            readOnly: false
