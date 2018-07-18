@@ -35,7 +35,25 @@ spec:
       containers:
       - env:
         - name: DRONE_ADMIN
-          value: "toschneck"
+          valueFrom:
+            secretKeyRef:
+              name: drone-secrets
+              key: DRONE_ADMIN
+        - name: DRONE_GITHUB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: drone-secrets
+              key: DRONE_GITHUB_CLIENT_ID
+        - name: DRONE_GITHUB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: drone-secrets
+              key: DRONE_GITHUB_CLIENT_SECRET
+        - name: DRONE_SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+             name: drone-secrets
+             key: DRONE_SESSION_SECRET
         - name: DRONE_CRON_DISABLED
           value: "true"
         - name: DRONE_CRON_INTERVAL
@@ -46,11 +64,6 @@ spec:
           value: "false"
         - name: DRONE_DEBUG
           value: "true"
-          #TODO use secret
-        - name: DRONE_GITHUB_CLIENT_ID
-          value: "aabbb44d43ec9c2f355d"
-        - name: DRONE_GITHUB_CLIENT_SECRET
-          value: "407f2742ffd664a06c736e40a8bea6a926f7f01b"
         - name: DRONE_KUBERNETES_NAMESPACE
           value: drone
         - name: DRONE_KUBERNETES
@@ -67,8 +80,6 @@ spec:
           value: "kubeci-tobi.eu.ngrok.io"
         - name: DRONE_SERVER_PROTO
           value: "https"
-        - name: DRONE_SESSION_SECRET
-          value: "secret"
         image: metalmatze/drone:latest
 #        image: drone/drone:latest
         imagePullPolicy: Always

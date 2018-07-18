@@ -2,6 +2,10 @@
 # Kubernetes cluster
 * version >= `1.10`
 
+# create namespace `drone`
+
+    kubectl create namespace drone
+
 # setup ngrok service
 *Only needed if no external LB is configured in the k8s cluster*
 Ngrok will exposes the services URL to the outside trough a revers-proxy
@@ -20,9 +24,11 @@ authtoken: <authtoken-val>
 * create github oauth: https://github.com/settings/applications
   * URL: https://<ngrok-server>
   * Callback URL: https://<ngrok-server>/login
-* Fill out values of:
+* Fill out values of in file `drone-github.env`:
   * `DRONE_ADMIN`
   * `DRONE_GITHUB_CLIENT_ID`
   * `DRONE_GITHUB_CLIENT_SECRET` 
   * `DRONE_SERVER_HOST`    
+* Create `drone-secrets`: `kubectl create secret generic drone-secrets --from-env-file=drone/drone-github.env`
+* Create persistent volumes: `kubectl apply -f drone/drone-pv-host.yaml`
 * Create Deployment: `kubectl apply -f drone/drone-deployment.yaml`
