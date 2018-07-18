@@ -99,6 +99,5 @@ spec:
             name: drone-vol
       volumes:
         - name: drone-vol
-          persistentVolumeClaim:
-            claimName: drone-vol
-            readOnly: false
+          hostPath:
+            path: /drone-data

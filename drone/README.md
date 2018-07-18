@@ -30,5 +30,4 @@ authtoken: <authtoken-val>
   * `DRONE_GITHUB_CLIENT_SECRET` 
   * `DRONE_SERVER_HOST`    
 * Create `drone-secrets`: `kubectl create secret generic drone-secrets --from-env-file=drone/drone-github.env`
-* Create persistent volumes: `kubectl apply -f drone/drone-pv-host.yaml`
 * Create Deployment: `kubectl apply -f drone/drone-deployment.yaml`
