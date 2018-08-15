@@ -2,15 +2,15 @@
 
 The GitHub repository [toschneck/openshift-example-bakery-ci-pipeline](https://github.com/toschneck/openshift-example-bakery-ci-pipeline) contains, the sourcecode for the examples of the talk **[OpenShift-Build-Pipelines: Build ► Test ► Run!](https://www.slideshare.net/TobiasSchneck/openshiftbuildpipelines-build-test-run)**:
 
-[![OpenShift Build Pipelines](.markdownpics/slide_first_page_1.png)](https://www.slideshare.net/TobiasSchneck/openshiftbuildpipelines-build-test-run)
+[![OpenShift Build Pipelines](.markdownpics/slide_first_page_1.png)](https://www.slideshare.net/TobiasSchneck/openshift-build-pipelines-lightweight-java-user-group-meetup)
 
 
-[**Youtube - OpenShift Build Pipelines**](https://www.youtube.com/watch?v=8Gwem76OxlA&t=0s&index=6&list=PLb4QXLP-7D3q-FIVFYKD-5VxM6bHjqau0)<br/>
+[**Youtube - OpenShift Build Pipelines (German)**](https://www.youtube.com/watch?v=8Gwem76OxlA&t=0s&index=6&list=PLb4QXLP-7D3q-FIVFYKD-5VxM6bHjqau0)<br/>
 [![Youtube - OpenShift Build Pipelines](https://img.youtube.com/vi/8Gwem76OxlA/0.jpg)](https://www.youtube.com/watch?v=8Gwem76OxlA)
 
 The example shows, how we can setup up total automated build pipeline with following components:
 
-* [OpenShift Build Pipelines](https://docs.openshift.com/container-platform/3.7/install_config/configuring_pipeline_execution.html) 
+* [OpenShift Build Pipelines](https://docs.openshift.com/container-platform/3.7/install_config/configuring_pipeline_execution.html) - tested with OpenShift version `3.7`
 * [Jenkinsfile](https://jenkins.io/doc/book/pipeline/jenkinsfile/)
 * [Docker](https://www.docker.com/)
 * [Maven](http://maven.apache.org/)
