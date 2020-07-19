@@ -1,4 +1,4 @@
-# Automated CI/CD Build Pipeline with Jenkis in OpenShift
+# Automated CI/CD Build Pipeline with Jenkins in OpenShift
 
 The GitHub repository [toschneck/openshift-example-bakery-ci-pipeline](https://github.com/toschneck/openshift-example-bakery-ci-pipeline) contains, the sourcecode for the examples of the talk **[OpenShift-Build-Pipelines: Build ► Test ► Run!](https://www.slideshare.net/TobiasSchneck/openshiftbuildpipelines-build-test-run)**:
 
