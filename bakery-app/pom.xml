@@ -18,7 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.1.7.RELEASE</spring.version>
+        <spring.version>6.0.0</spring.version>
         <apache.camel.version>2.15.2</apache.camel.version>
         <activemq.version>5.11.1</activemq.version>
         <testng.version>6.9.6</testng.version>
